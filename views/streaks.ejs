@@ -1,0 +1,185 @@
+<%- include('partials/header') %>
+<%- include('partials/navbar') %>
+
+<main class="main-content">
+  <div class="container">
+    
+    <!-- Habit Streak Banner -->
+    <div class="dzong-banner" style="margin-bottom: 30px;">
+      <div style="display: flex; align-items: center; justify-content: space-between; flex-wrap: wrap; gap: 20px;">
+        <div style="display: flex; align-items: center; gap: 22px;">
+          <div style="width: 80px; height: 80px; border-radius: 20px; background: rgba(245, 158, 11, 0.2); border: 1px solid rgba(245, 158, 11, 0.4); display: flex; align-items: center; justify-content: center; font-size: 2.6rem; color: #F59E0B; box-shadow: 0 0 30px rgba(245, 158, 11, 0.35);">
+            <i class="fa-solid fa-fire"></i>
+          </div>
+          <div>
+            <span class="badge badge-gold" style="margin-bottom: 8px;">
+              <i class="fa-solid fa-fire"></i> DAILY HABIT STREAK
+            </span>
+            <h1 style="font-size: 2.3rem; margin-bottom: 6px; font-weight: 800; letter-spacing: -0.03em; color: var(--text-main);">
+              <%= streak ? streak.current_streak : 0 %> Consecutive Days of Financial Discipline
+            </h1>
+            <p style="color: var(--text-muted); font-size: 0.96rem; max-width: 620px; margin: 0; line-height: 1.6;">
+              Consistency transforms small daily actions into long-term financial freedom. Maintain your unbroken streak by logging daily or confirming a zero-spending day!
+            </p>
+          </div>
+        </div>
+
+        <div style="display: flex; align-items: center; gap: 14px; flex-wrap: wrap;">
+          <% if (!hasLoggedToday) { %>
+            <button class="btn btn-primary btn-lg" data-open-modal="zero-spending-modal">
+              <i class="fa-solid fa-shield-halved"></i> No Spending Today
+            </button>
+          <% } else { %>
+            <div class="badge badge-success" style="font-size: 0.96rem; padding: 12px 20px; border-radius: 12px; box-shadow: 0 0 20px rgba(16, 185, 129, 0.25);">
+              <i class="fa-solid fa-circle-check"></i> Today's Streak Secured!
+            </div>
+          <% } %>
+        </div>
+      </div>
+    </div>
+
+    <% if (query && query.zero_confirmed) { %>
+      <div style="background: rgba(16, 185, 129, 0.15); border: 1px solid rgba(16, 185, 129, 0.35); color: #34D399; padding: 16px 22px; border-radius: 12px; font-size: 0.96rem; margin-bottom: 26px; display: flex; align-items: center; gap: 12px; box-shadow: var(--shadow-sm);">
+        <i class="fa-solid fa-shield-heart" style="font-size: 1.3rem;"></i> 
+        <span>Zero-spending day confirmed! Your diligence flame has been protected and extended for today.</span>
+      </div>
+    <% } %>
+
+    <!-- Quick Stats Grid -->
+    <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(240px, 1fr)); gap: 22px; margin-bottom: 30px;">
+      <div class="glass-panel metric-card" style="border-top: 3px solid #D97706;">
+        <div class="metric-label">
+          <i class="fa-solid fa-fire streak-flame"></i> Active Daily Streak
+        </div>
+        <div class="metric-value" style="color: #FBBF24;">
+          <%= streak ? streak.current_streak : 0 %> Days
+        </div>
+        <div class="metric-sub">Consecutive daily awareness</div>
+      </div>
+
+      <div class="glass-panel metric-card" style="border-top: 3px solid var(--gold);">
+        <div class="metric-label">
+          <i class="fa-solid fa-trophy" style="color: var(--gold);"></i> Longest Diligence Record
+        </div>
+        <div class="metric-value" style="color: var(--gold-pale);">
+          <%= streak ? streak.longest_streak : 0 %> Days
+        </div>
+        <div class="metric-sub">Personal all-time mastery</div>
+      </div>
+
+      <div class="glass-panel metric-card" style="border-top: 3px solid #10B981;">
+        <div class="metric-label">
+          <i class="fa-solid fa-calendar-check" style="color: #34D399;"></i> Total Days Tracked
+        </div>
+        <div class="metric-value" style="color: #34D399;">
+          <%= streak ? streak.total_days_tracked : 0 %> Days
+        </div>
+        <div class="metric-sub">Lifetime financial vigilance</div>
+      </div>
+
+      <div class="glass-panel metric-card" style="border-top: 3px solid #38BDF8; display: flex; align-items: center; justify-content: space-between;">
+        <div>
+          <div class="metric-label">
+            <i class="fa-solid fa-shield"></i> Protective Shields
+          </div>
+          <div class="metric-value" style="color: #38BDF8;"><%= streak ? streak.streak_freezes : 0 %> Left</div>
+          <div class="metric-sub">Protects against unforeseen pauses</div>
+        </div>
+        <div>
+          <form action="/streaks/use-freeze" method="POST" onsubmit="return confirm('Activate 1 protective freeze shield for today?');">
+            <button type="submit" class="btn btn-outline btn-sm" <%= (streak && streak.streak_freezes > 0) ? '' : 'disabled' %>>
+              <i class="fa-solid fa-shield"></i> Deploy
+            </button>
+          </form>
+        </div>
+      </div>
+    </div>
+
+    <!-- Habit Milestones & Badges Showcase -->
+    <div class="glass-panel" style="padding: 32px; margin-bottom: 30px;">
+      <div style="margin-bottom: 24px;">
+        <span class="badge badge-gold" style="margin-bottom: 8px;">ACHIEVEMENTS</span>
+        <h3 style="font-size: 1.4rem; margin-bottom: 6px; display: flex; align-items: center; gap: 10px; color: var(--gold-pale);">
+          <i class="fa-solid fa-award" style="color: var(--gold);"></i> Habit Milestones & Achievement Badges
+        </h3>
+        <p style="color: var(--text-muted); font-size: 0.94rem;">
+          Maintain consistent financial awareness across consecutive days to unlock milestone achievement badges.
+        </p>
+      </div>
+
+      <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(210px, 1fr)); gap: 20px;">
+        <% const milestones = [
+          { days: 7, name: '7-Day Progress', icon: 'fa-fire-flame-curved', desc: 'Consistent habit ignited' },
+          { days: 14, name: '14-Day Discipline Hero', icon: 'fa-shield-halved', desc: 'Fortnight of steady discipline' },
+          { days: 30, name: '30-Day Mindfulness Crown', icon: 'fa-crown', desc: 'A full month of conscious tracking' },
+          { days: 60, name: '60-Day Wealth Guardian', icon: 'fa-gem', desc: 'Exemplary habit of prudence' },
+          { days: 100, name: '100-Day Century Master', icon: 'fa-dharmachakra', desc: 'Mastery of mindful wealth' }
+        ]; %>
+
+        <% milestones.forEach(m => { %>
+          <% const isUnlocked = (streak && streak.current_streak >= m.days) || (badges && badges.some(b => b.milestone_days === m.days)); %>
+          <div class="apple-reveal milestone-card" style="background: <%= isUnlocked ? 'rgba(140, 28, 19, 0.16)' : 'rgba(255, 255, 255, 0.03)' %>; border: 1px solid <%= isUnlocked ? 'var(--border-gold)' : 'var(--border-subtle)' %>; border-radius: 14px; padding: 24px 18px; text-align: center; position: relative;">
+            <div style="width: 62px; height: 62px; margin: 0 auto 16px; border-radius: 50%; background: <%= isUnlocked ? 'rgba(197, 160, 89, 0.2)' : 'rgba(255, 255, 255, 0.05)' %>; display: flex; align-items: center; justify-content: center; font-size: 1.8rem; color: <%= isUnlocked ? 'var(--gold)' : 'var(--text-subtle)' %>; border: 1px solid <%= isUnlocked ? 'var(--border-gold)' : 'transparent' %>;">
+              <i class="fa-solid <%= m.icon %>"></i>
+            </div>
+            <h4 style="font-family: 'Outfit', sans-serif; font-size: 1.05rem; font-weight: 700; margin-bottom: 6px; color: <%= isUnlocked ? 'var(--text-main)' : 'var(--text-muted)' %>;"><%= m.name %></h4>
+            <div style="font-size: 0.82rem; color: var(--text-subtle); margin-bottom: 14px;"><%= m.desc %></div>
+            <% if (isUnlocked) { %>
+              <span class="badge badge-gold"><i class="fa-solid fa-certificate"></i> Badge Unlocked</span>
+            <% } else { %>
+              <div style="background: rgba(255, 255, 255, 0.08); height: 6px; border-radius: 9999px; overflow: hidden; margin-bottom: 6px;">
+                <div style="height: 100%; width: <%= Math.min(Math.round(((streak ? streak.current_streak : 0) / m.days) * 100), 100) %>%; background: var(--crimson-gradient); border-radius: 9999px;"></div>
+              </div>
+              <span style="font-size: 0.78rem; color: var(--text-subtle);"><%= streak ? streak.current_streak : 0 %> / <%= m.days %> Days</span>
+            <% } %>
+          </div>
+        <% }); %>
+      </div>
+    </div>
+
+    <!-- 30-Day Activity History -->
+    <div class="glass-panel" style="padding: 32px;">
+      <h3 style="font-size: 1.35rem; margin-bottom: 20px; display: flex; align-items: center; gap: 10px; color: var(--gold-pale);">
+        <i class="fa-solid fa-calendar-days" style="color: var(--gold);"></i> 30-Day Habit Tracking History
+      </h3>
+
+      <% if (logs && logs.length > 0) { %>
+        <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(280px, 1fr)); gap: 14px;">
+          <% logs.forEach(log => { %>
+            <div class="apple-reveal activity-log-item" style="display: flex; align-items: center; justify-content: space-between; padding: 14px 18px; border-radius: 12px; background: rgba(140, 28, 19, 0.1); border: 1px solid var(--border-gold);">
+              <div style="display: flex; align-items: center; gap: 14px;">
+                <div style="font-size: 1.4rem;">
+                  <% if (log.activity_type === 'zero_spending_confirmed') { %>
+                    🛡️
+                  <% } else if (log.activity_type === 'streak_freeze_used') { %>
+                    ❄️
+                  <% } else { %>
+                    ⚡
+                  <% } %>
+                </div>
+                <div>
+                  <div style="font-weight: 600; font-size: 0.94rem; color: var(--text-main);">
+                    <%= new Date(log.activity_date).toLocaleDateString(undefined, { weekday: 'short', month: 'short', day: 'numeric', year: 'numeric' }) %>
+                  </div>
+                  <div style="font-size: 0.8rem; color: var(--text-muted);">
+                    <%= log.notes || (log.activity_type === 'zero_spending_confirmed' ? 'Mindful zero expenditure confirmed' : 'Daily transaction logged') %>
+                  </div>
+                </div>
+              </div>
+              <span class="badge <%= log.activity_type === 'zero_spending_confirmed' ? 'badge-gold' : 'badge-success' %>">
+                Active
+              </span>
+            </div>
+          <% }); %>
+        </div>
+      <% } else { %>
+        <p style="color: var(--text-muted); font-size: 0.92rem;">No tracking history yet. Log your first transaction or zero-spending day to start your streak!</p>
+      <% } %>
+    </div>
+
+  </div>
+</main>
+
+<%- include('partials/quick-add-modal') %>
+<%- include('partials/zero-spending-modal') %>
+<%- include('partials/footer') %>

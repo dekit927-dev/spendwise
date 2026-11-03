@@ -1,0 +1,260 @@
+<%- include('partials/header') %>
+<%- include('partials/navbar') %>
+
+<main class="main-content">
+  <div class="container">
+    <!-- Header with Action Buttons -->
+    <div style="display: flex; align-items: center; justify-content: space-between; flex-wrap: wrap; gap: 16px; margin-bottom: 24px;">
+      <div>
+        <span class="badge badge-gold" style="margin-bottom: 6px;">
+          <i class="fa-solid fa-receipt"></i> TRANSACTIONS
+        </span>
+        <h1 style="font-size: 2.2rem; margin-bottom: 4px; font-weight: 800; letter-spacing: -0.03em;">Transactions & Expense Log</h1>
+        <p style="color: var(--text-muted); font-size: 0.94rem;">Track your income and daily spending to keep your habits consistent.</p>
+      </div>
+      <div style="display: flex; align-items: center; gap: 12px; flex-wrap: wrap;">
+        <button class="btn btn-outline" data-open-modal="zero-spending-modal">
+          <i class="fa-solid fa-shield-halved"></i> No Spending Today
+        </button>
+        <button class="btn btn-primary" data-open-modal="quick-add-modal">
+          <i class="fa-solid fa-plus"></i> Add Transaction
+        </button>
+      </div>
+    </div>
+
+    <% if (query && query.success) { %>
+      <div style="background: rgba(16, 185, 129, 0.15); border: 1px solid rgba(16, 185, 129, 0.35); color: #34D399; padding: 14px 20px; border-radius: 12px; font-size: 0.94rem; margin-bottom: 22px; display: flex; align-items: center; gap: 10px; box-shadow: var(--shadow-sm);">
+        <i class="fa-solid fa-circle-check"></i> Transaction recorded successfully and your tracking streak has been extended!
+      </div>
+    <% } else if (query && query.deleted) { %>
+      <div style="background: rgba(244, 63, 94, 0.15); border: 1px solid rgba(244, 63, 94, 0.35); color: #FB7185; padding: 14px 20px; border-radius: 12px; font-size: 0.94rem; margin-bottom: 22px; display: flex; align-items: center; gap: 10px;">
+        <i class="fa-solid fa-trash"></i> Ledger entry removed.
+      </div>
+    <% } else if (query && query.updated) { %>
+      <div style="background: rgba(197, 160, 89, 0.15); border: 1px solid var(--border-gold); color: var(--gold-pale); padding: 14px 20px; border-radius: 12px; font-size: 0.94rem; margin-bottom: 22px; display: flex; align-items: center; gap: 10px;">
+        <i class="fa-solid fa-pen-to-square"></i> Ledger entry updated successfully.
+      </div>
+    <% } else if (query && query.error) { %>
+      <div style="background: rgba(239, 68, 68, 0.15); border: 1px solid rgba(239, 68, 68, 0.35); color: #F87171; padding: 14px 20px; border-radius: 12px; font-size: 0.94rem; margin-bottom: 22px; display: flex; align-items: center; gap: 10px;">
+        <i class="fa-solid fa-triangle-exclamation"></i> <%= query.error %>
+      </div>
+    <% } %>
+
+    <!-- Filters Bar -->
+    <div class="glass-panel" style="padding: 22px; margin-bottom: 26px;">
+      <form action="/transactions" method="GET" class="filter-form">
+        <div>
+          <label class="form-label">Flow Type</label>
+          <select name="type" class="form-control form-select">
+            <option value="">All Transactions</option>
+            <option value="expense" <%= query.type === 'expense' ? 'selected' : '' %>>Expenditure (Outflow)</option>
+            <option value="income" <%= query.type === 'income' ? 'selected' : '' %>>Income (Inflow)</option>
+          </select>
+        </div>
+
+        <div>
+          <label class="form-label">Category</label>
+          <select name="categoryId" class="form-control form-select">
+            <option value="">All Categories</option>
+            <% categories.forEach(c => { %>
+              <option value="<%= c.id %>" <%= query.categoryId == c.id ? 'selected' : '' %>><%= c.name %></option>
+            <% }); %>
+          </select>
+        </div>
+
+        <div>
+          <label class="form-label">From Date</label>
+          <input type="date" name="startDate" class="form-control" value="<%= query.startDate || '' %>">
+        </div>
+
+        <div>
+          <label class="form-label">To Date</label>
+          <input type="date" name="endDate" class="form-control" value="<%= query.endDate || '' %>">
+        </div>
+
+        <div style="display: flex; gap: 10px;">
+          <button type="submit" class="btn btn-primary" style="height: 44px;">
+            <i class="fa-solid fa-filter"></i> Filter
+          </button>
+          <a href="/transactions" class="btn btn-outline" style="height: 44px;" title="Reset Filters">
+            <i class="fa-solid fa-rotate-left"></i>
+          </a>
+        </div>
+      </form>
+    </div>
+
+    <!-- Transactions Table -->
+    <div class="glass-panel" style="padding: 28px;">
+      <div style="display: flex; align-items: center; justify-content: space-between; margin-bottom: 20px; flex-wrap: wrap; gap: 12px;">
+        <h3 style="font-size: 1.3rem; color: var(--gold-pale); margin: 0;">
+          <i class="fa-solid fa-scroll" style="color: var(--gold);"></i> Inscriptions (<%= transactions.length %>)
+        </h3>
+        <span class="badge badge-gold"><i class="fa-solid fa-coins"></i> Standard: <%= currency %> (Ngultrum)</span>
+      </div>
+
+      <% if (transactions && transactions.length > 0) { %>
+        <div class="data-table-wrapper">
+          <table class="data-table">
+            <thead>
+              <tr>
+                <th>Category</th>
+                <th>Description</th>
+                <th>Date</th>
+                <th>Channel</th>
+                <th>Voucher</th>
+                <th style="text-align: right;">Amount</th>
+                <th style="text-align: center;">Actions</th>
+              </tr>
+            </thead>
+            <tbody>
+              <% transactions.forEach(t => { %>
+                <tr class="apple-row-reveal">
+                  <td>
+                    <div style="display: flex; align-items: center; gap: 10px;">
+                      <div style="width: 38px; height: 38px; border-radius: 8px; background: <%= t.category_color ? t.category_color + '22' : 'rgba(197,160,89,0.1)' %>; display: flex; align-items: center; justify-content: center; color: <%= t.category_color || 'var(--gold)' %>; border: 1px solid var(--border-subtle);">
+                        <i class="fa-solid <%= t.category_icon || 'fa-tag' %>"></i>
+                      </div>
+                      <span style="font-weight: 600; color: var(--text-main);">
+                        <%= t.category_name || 'Uncategorized' %>
+                      </span>
+                    </div>
+                  </td>
+                  <td>
+                    <div style="font-weight: 500; color: var(--text-main);">
+                      <%= t.description %>
+                    </div>
+                    <% if (t.is_zero_spending_day) { %>
+                      <span class="badge badge-success" style="font-size: 0.72rem; margin-top: 4px;">Mindful Nu. 0 Day</span>
+                    <% } %>
+                  </td>
+                  <td style="color: var(--text-muted); font-size: 0.88rem;">
+                    <%= new Date(t.transaction_date).toLocaleDateString(undefined, { year: 'numeric', month: 'short', day: 'numeric' }) %>
+                  </td>
+                  <td>
+                    <span class="badge badge-gold" style="font-size: 0.76rem;">
+                      <%= t.payment_method %>
+                    </span>
+                  </td>
+                  <td>
+                    <% if (t.receipt_url) { %>
+                      <a href="<%= t.receipt_url %>" target="_blank" class="btn btn-outline btn-sm" style="padding: 4px 10px; font-size: 0.78rem;">
+                        <i class="fa-solid fa-paperclip"></i> View
+                      </a>
+                    <% } else { %>
+                      <span style="color: var(--text-subtle); font-size: 0.8rem;">—</span>
+                    <% } %>
+                  </td>
+                  <td style="text-align: right; font-weight: 700; font-family: 'Outfit', sans-serif; font-size: 1.12rem; color: <%= t.type === 'income' ? '#34D399' : '#FCA5A5' %>; letter-spacing: -0.02em;">
+                    <%= t.type === 'income' ? '+' : '-' %> <%= currency %> <%= parseFloat(t.amount).toLocaleString(undefined, {minimumFractionDigits: 2}) %>
+                  </td>
+                  <td style="text-align: center;">
+                    <div style="display: flex; align-items: center; justify-content: center; gap: 8px;">
+                      <!-- Edit Button -->
+                      <button type="button" class="btn btn-outline btn-sm btn-edit-tx" style="padding: 6px 10px;"
+                        data-id="<%= t.id %>"
+                        data-type="<%= t.type %>"
+                        data-amount="<%= t.amount %>"
+                        data-category-id="<%= t.category_id || '' %>"
+                        data-description="<%= t.description %>"
+                        data-date="<%= typeof t.transaction_date === 'string' ? t.transaction_date.substring(0, 10) : new Date(t.transaction_date).toISOString().split('T')[0] %>"
+                        data-method="<%= t.payment_method || 'BoB mBoB' %>"
+                        title="Edit">
+                        <i class="fa-solid fa-pen"></i>
+                      </button>
+                      <!-- Delete Form -->
+                      <form action="/transactions/delete/<%= t.id %>" method="POST" onsubmit="return confirm('Delete this ledger record?');" style="margin: 0;">
+                        <button type="submit" class="btn btn-outline btn-sm" style="padding: 6px 10px; color: #FB7185;" title="Delete">
+                          <i class="fa-solid fa-trash"></i>
+                        </button>
+                      </form>
+                    </div>
+                  </td>
+                </tr>
+              <% }); %>
+            </tbody>
+          </table>
+        </div>
+      <% } else { %>
+        <div style="text-align: center; padding: 48px 20px; color: var(--text-muted);">
+          <i class="fa-solid fa-feather-pointed" style="font-size: 2.8rem; margin-bottom: 12px; color: var(--gold); opacity: 0.5;"></i>
+          <h4 style="font-family: 'Outfit', sans-serif; font-size: 1.25rem; font-weight: 700; margin-bottom: 6px; color: var(--text-main);">No transactions found</h4>
+          <p style="font-size: 0.92rem;">Log your daily transactions to maintain awareness and keep your streak going!</p>
+        </div>
+      <% } %>
+    </div>
+  </div>
+</main>
+
+<!-- Edit Transaction Modal -->
+<div id="edit-transaction-modal" class="modal-backdrop">
+  <div class="modal-box">
+    <div class="modal-header">
+      <h3 style="font-size: 1.25rem; color: var(--gold-pale);">Edit Ledger Inscription</h3>
+      <button type="button" data-close-modal style="background: none; border: none; color: var(--gold); font-size: 1.4rem; cursor: pointer;">&times;</button>
+    </div>
+    <form id="edit-tx-form" method="POST" enctype="multipart/form-data">
+      <div class="modal-body">
+        <div class="form-group">
+          <label class="form-label">Flow Type</label>
+          <select name="type" id="edit-type" class="form-control form-select">
+            <option value="expense">Expenditure (Outflow)</option>
+            <option value="income">Income (Inflow)</option>
+          </select>
+        </div>
+
+        <div class="form-group">
+          <label class="form-label">Amount in Ngultrum (<%= currency %>) *</label>
+          <input type="number" step="0.01" name="amount" id="edit-amount" class="form-control" required style="font-weight: 600; font-size: 1.1rem;">
+        </div>
+
+        <div class="form-group">
+          <label class="form-label">Category</label>
+          <select name="category_id" id="edit-category" class="form-control form-select">
+            <% categories.forEach(cat => { %>
+              <option value="<%= cat.id %>">
+                <%= cat.name %> (<%= cat.type %>)
+              </option>
+            <% }); %>
+          </select>
+        </div>
+
+        <div class="form-group">
+          <label class="form-label">Description *</label>
+          <input type="text" name="description" id="edit-description" class="form-control" required>
+        </div>
+
+        <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 14px;">
+          <div class="form-group">
+            <label class="form-label">Date *</label>
+            <input type="date" name="transaction_date" id="edit-date" class="form-control" required>
+          </div>
+          <div class="form-group">
+            <label class="form-label">Payment Channel</label>
+            <select name="payment_method" id="edit-method" class="form-control form-select">
+              <option value="BoB mBoB">BoB (mBoB)</option>
+              <option value="BNB mPay">BNB (mPay)</option>
+              <option value="BDBL e-Banking">BDBL e-Banking</option>
+              <option value="PNB (Bhutan)">PNB (Bhutan)</option>
+              <option value="Mobile Wallet (e-Teeru)">Mobile Wallet (e-Teeru)</option>
+              <option value="Cash in Hand">Cash (Ngultrum)</option>
+              <option value="Bank Transfer">Bank Transfer</option>
+            </select>
+          </div>
+        </div>
+
+        <div class="form-group">
+          <label class="form-label">Update Voucher (Optional)</label>
+          <input type="file" name="receipt" accept="image/*,.pdf" class="form-control">
+        </div>
+      </div>
+      <div class="modal-footer">
+        <button type="button" class="btn btn-outline" data-close-modal>Cancel</button>
+        <button type="submit" class="btn btn-primary">Save Changes</button>
+      </div>
+    </form>
+  </div>
+</div>
+
+<%- include('partials/quick-add-modal') %>
+<%- include('partials/zero-spending-modal') %>
+<%- include('partials/footer') %>

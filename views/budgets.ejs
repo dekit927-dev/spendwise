@@ -1,0 +1,166 @@
+<%- include('partials/header') %>
+<%- include('partials/navbar') %>
+
+<main class="main-content">
+  <div class="container">
+    <div style="display: flex; align-items: center; justify-content: space-between; flex-wrap: wrap; gap: 16px; margin-bottom: 26px;">
+      <div>
+        <span class="badge badge-gold" style="margin-bottom: 6px;">
+          <i class="fa-solid fa-wallet"></i> MINDFUL ALLOCATION
+        </span>
+        <h1 style="font-size: 2.2rem; margin-bottom: 4px; color: var(--gold-pale);">Monthly Budget Discipline</h1>
+        <p style="color: var(--text-muted); font-size: 0.94rem;">Establish mindful spending ceilings in Ngultrum to avoid excess and preserve wealth.</p>
+      </div>
+
+      <div style="display: flex; align-items: center; gap: 12px; flex-wrap: wrap;">
+        <form action="/budgets" method="GET" style="margin: 0;">
+          <input type="month" name="month" class="form-control" value="<%= month %>" onchange="this.form.submit()" style="padding: 8px 16px; font-size: 0.92rem; width: auto; font-family: 'Plus Jakarta Sans', sans-serif; font-weight: 600;">
+        </form>
+        <button class="btn btn-primary" data-open-modal="add-budget-modal">
+          <i class="fa-solid fa-plus"></i> Configure Budget
+        </button>
+      </div>
+    </div>
+
+    <% if (typeof query !== 'undefined' && query && query.success) { %>
+      <div style="background: rgba(16, 185, 129, 0.15); border: 1px solid rgba(16, 185, 129, 0.35); color: #34D399; padding: 14px 20px; border-radius: 12px; font-size: 0.94rem; margin-bottom: 22px; display: flex; align-items: center; gap: 10px; box-shadow: var(--shadow-sm);">
+        <i class="fa-solid fa-circle-check"></i> Budget ceiling configured and saved successfully!
+      </div>
+    <% } else if (typeof query !== 'undefined' && query && query.deleted) { %>
+      <div style="background: rgba(244, 63, 94, 0.15); border: 1px solid rgba(244, 63, 94, 0.35); color: #FB7185; padding: 14px 20px; border-radius: 12px; font-size: 0.94rem; margin-bottom: 22px; display: flex; align-items: center; gap: 10px;">
+        <i class="fa-solid fa-trash"></i> Budget ceiling removed.
+      </div>
+    <% } else if (typeof query !== 'undefined' && query && query.error) { %>
+      <div style="background: rgba(239, 68, 68, 0.15); border: 1px solid rgba(239, 68, 68, 0.35); color: #F87171; padding: 14px 20px; border-radius: 12px; font-size: 0.94rem; margin-bottom: 22px; display: flex; align-items: center; gap: 10px;">
+        <i class="fa-solid fa-triangle-exclamation"></i> <%= decodeURIComponent(query.error) %>
+      </div>
+    <% } %>
+
+    <!-- Budgets Grid -->
+    <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(min(100%, 280px), 1fr)); gap: 24px;">
+      <% if (budgets && budgets.length > 0) { %>
+        <% budgets.forEach(b => { %>
+          <div class="glass-panel apple-reveal" style="padding: 26px; border-top: 3px solid <%= b.is_exceeded ? '#8C1C13' : 'var(--gold)' %>;">
+            <div style="display: flex; align-items: center; justify-content: space-between; margin-bottom: 16px;">
+              <div style="display: flex; align-items: center; gap: 12px;">
+                <div style="width: 42px; height: 42px; border-radius: 10px; background: <%= b.category_color ? b.category_color + '22' : 'rgba(197, 160, 89, 0.15)' %>; display: flex; align-items: center; justify-content: center; color: <%= b.category_color || 'var(--gold)' %>; border: 1px solid var(--border-gold);">
+                  <i class="fa-solid <%= b.category_icon || 'fa-wallet' %>"></i>
+                </div>
+                <div>
+                  <h3 style="font-size: 1.15rem; margin: 0; color: var(--gold-pale);">
+                    <%= b.category_name || 'Overall Monthly Ceiling' %>
+                  </h3>
+                  <span style="font-size: 0.78rem; color: var(--text-subtle);">Alert threshold: <%= b.alert_threshold %>%</span>
+                </div>
+              </div>
+
+              <!-- Delete form -->
+              <form action="/budgets/delete/<%= b.id %>" method="POST" onsubmit="return confirm('Remove this budget ceiling?');" style="margin: 0;">
+                <button type="submit" class="btn btn-outline btn-sm" style="padding: 4px 8px; color: #FB7185;" title="Remove Budget">
+                  <i class="fa-solid fa-trash"></i>
+                </button>
+              </form>
+            </div>
+
+            <!-- Budget Amounts -->
+            <div style="display: flex; justify-content: space-between; align-items: baseline; margin-bottom: 10px;">
+              <div>
+                <span style="font-size: 0.82rem; color: var(--text-muted);">Spent: </span>
+                <span style="font-weight: 700; font-family: 'Outfit', sans-serif; font-size: 1.3rem; color: <%= b.is_exceeded ? '#FB7185' : 'var(--text-main)' %>;">
+                  <%= currency %> <%= b.spent_amount.toLocaleString() %>
+                </span>
+              </div>
+              <div>
+                <span style="font-size: 0.82rem; color: var(--text-muted);">Limit: </span>
+                <span style="font-weight: 600; font-family: 'Outfit', sans-serif; font-size: 1rem; color: var(--text-muted);">
+                  <%= currency %> <%= b.budget_amount.toLocaleString() %>
+                </span>
+              </div>
+            </div>
+
+            <!-- Progress Bar -->
+            <div style="background: rgba(255, 255, 255, 0.08); height: 9px; border-radius: 9999px; overflow: hidden; margin-bottom: 10px; border: 1px solid var(--border-subtle);">
+              <div style="height: 100%; width: <%= Math.min(b.percentage_used, 100) %>%; background: <%= b.is_exceeded ? '#8C1C13' : (b.is_near_limit ? '#D97706' : 'var(--brand-gradient-colors)') %>; border-radius: 9999px; transition: width 0.35s ease;"></div>
+            </div>
+
+            <!-- Footer Details -->
+            <div style="display: flex; justify-content: space-between; align-items: center; font-size: 0.85rem;">
+              <span>
+                <% if (b.is_exceeded) { %>
+                  <span class="badge badge-crimson">Exceeded by <%= currency %> <%= (b.spent_amount - b.budget_amount).toLocaleString() %></span>
+                <% } else if (b.is_near_limit) { %>
+                  <span class="badge badge-warning">Approaching Ceiling (<%= b.percentage_used %>%)</span>
+                <% } else { %>
+                  <span class="badge badge-gold"><%= b.percentage_used %>% Utilized</span>
+                <% } %>
+              </span>
+              <span style="color: var(--text-muted);">
+                Remaining: <strong style="color: <%= b.remaining_amount >= 0 ? '#34D399' : '#FB7185' %>;"><%= currency %> <%= Math.max(0, b.remaining_amount).toLocaleString() %></strong>
+              </span>
+            </div>
+          </div>
+        <% }); %>
+      <% } else { %>
+        <div class="glass-panel" style="grid-column: 1 / -1; padding: 48px 20px; text-align: center; color: var(--text-muted);">
+          <i class="fa-solid fa-scale-balanced" style="font-size: 3rem; margin-bottom: 14px; color: var(--gold); opacity: 0.5;"></i>
+          <h3 style="font-family: 'Outfit', sans-serif; font-size: 1.35rem; font-weight: 700; margin-bottom: 6px; color: var(--text-main);">No Budgets Set For <%= month %></h3>
+          <p style="margin-bottom: 22px; max-width: 500px; margin-left: auto; margin-right: auto;">Setting monthly limits enables proactive alerts to guide your spending.</p>
+          <button class="btn btn-primary" data-open-modal="add-budget-modal">
+            <i class="fa-solid fa-plus"></i> Configure <%= month %> Budget
+          </button>
+        </div>
+      <% } %>
+    </div>
+  </div>
+</main>
+
+<!-- Add Budget Modal -->
+<div id="add-budget-modal" class="modal-backdrop">
+  <div class="modal-box">
+    <div class="modal-header">
+      <h3 style="font-size: 1.25rem; font-weight: 700; color: var(--text-main);">Configure Monthly Budget</h3>
+      <button type="button" data-close-modal style="background: none; border: none; color: var(--text-muted); font-size: 1.4rem; cursor: pointer;">&times;</button>
+    </div>
+    <form action="/budgets" method="POST">
+      <div class="modal-body">
+        <div class="form-group">
+          <label class="form-label">Period (Month) *</label>
+          <input type="month" name="month" class="form-control" value="<%= month %>" required style="font-family: 'Plus Jakarta Sans', sans-serif;">
+        </div>
+
+        <div class="form-group">
+          <label class="form-label">Category</label>
+          <select name="category_id" class="form-control form-select">
+            <option value="">Overall Monthly Limit (All Categories)</option>
+            <% categories.forEach(cat => { %>
+              <option value="<%= cat.id %>"><%= cat.name %></option>
+            <% }); %>
+          </select>
+          <small style="color: var(--text-subtle); font-size: 0.78rem; display: block; margin-top: 4px;">Choose "Overall Monthly Limit" for your general ceiling, or select an individual category.</small>
+        </div>
+
+        <div class="form-group">
+          <label class="form-label">Ceiling Amount (<%= currency %>) *</label>
+          <input type="number" step="0.01" name="amount" class="form-control" placeholder="e.g. 6000.00" required style="font-size: 1.1rem; font-weight: 600;">
+        </div>
+
+        <div class="form-group">
+          <label class="form-label">Alert Warning Threshold</label>
+          <select name="alert_threshold" class="form-control form-select">
+            <option value="80" selected>Warn at 80% used (Default)</option>
+            <option value="70">Warn at 70% used (Early warning)</option>
+            <option value="90">Warn at 90% used (Critical warning)</option>
+          </select>
+        </div>
+      </div>
+      <div class="modal-footer">
+        <button type="button" class="btn btn-outline" data-close-modal>Cancel</button>
+        <button type="submit" class="btn btn-primary">Save Budget Ceiling</button>
+      </div>
+    </form>
+  </div>
+</div>
+
+<%- include('partials/quick-add-modal') %>
+<%- include('partials/zero-spending-modal') %>
+<%- include('partials/footer') %>

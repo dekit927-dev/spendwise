@@ -1,0 +1,109 @@
+<%- include('partials/header') %>
+<%- include('partials/navbar') %>
+
+<main class="main-content">
+  <div class="container" style="max-width: 920px;">
+    <div style="display: flex; align-items: center; justify-content: space-between; flex-wrap: wrap; gap: 16px; margin-bottom: 26px;">
+      <div>
+        <span class="badge badge-gold" style="margin-bottom: 6px;">
+          <i class="fa-solid fa-bell"></i> REAL-TIME DISPATCHES
+        </span>
+        <h1 style="font-size: 2.2rem; margin-bottom: 4px; color: var(--gold-pale);">Auspicious Notifications</h1>
+        <p style="color: var(--text-muted); font-size: 0.94rem;">Automated alerts for diligence streaks, budget ceilings, and upcoming utility dates.</p>
+      </div>
+
+      <% if (notifications && notifications.length > 0) { %>
+        <form action="/notifications/mark-all-read" method="POST" style="margin: 0;">
+          <button type="submit" class="btn btn-outline btn-sm">
+            <i class="fa-solid fa-check-double"></i> Mark All as Acknowledged
+          </button>
+        </form>
+      <% } %>
+    </div>
+
+    <% if (query && query.all_read) { %>
+      <div style="background: rgba(16, 185, 129, 0.15); border: 1px solid rgba(16, 185, 129, 0.35); color: #34D399; padding: 14px 20px; border-radius: 12px; font-size: 0.94rem; margin-bottom: 22px; display: flex; align-items: center; gap: 10px; box-shadow: var(--shadow-sm);">
+        <i class="fa-solid fa-circle-check"></i> All auspicious dispatches marked as acknowledged!
+      </div>
+    <% } else if (query && query.deleted) { %>
+      <div style="background: rgba(244, 63, 94, 0.15); border: 1px solid rgba(244, 63, 94, 0.35); color: #FB7185; padding: 14px 20px; border-radius: 12px; font-size: 0.94rem; margin-bottom: 22px; display: flex; align-items: center; gap: 10px;">
+        <i class="fa-solid fa-trash"></i> Notification dismissed.
+      </div>
+    <% } %>
+
+    <!-- Notification Cards Container -->
+    <div style="display: flex; flex-direction: column; gap: 12px;">
+      <% if (notifications && notifications.length > 0) { %>
+        <% notifications.forEach(n => { %>
+          <% 
+            let iconClass = 'fa-bell';
+            let iconColor = 'var(--gold)';
+            let bgGlow = 'rgba(197, 160, 89, 0.15)';
+            if (n.type === 'streak_milestone') {
+              iconClass = 'fa-fire streak-flame';
+              iconColor = '#F59E0B';
+              bgGlow = 'rgba(217, 119, 6, 0.2)';
+            } else if (n.type === 'budget_warning') {
+              iconClass = 'fa-triangle-exclamation';
+              iconColor = '#F59E0B';
+              bgGlow = 'rgba(245, 158, 11, 0.2)';
+            } else if (n.type === 'unusual_expense') {
+              iconClass = 'fa-bolt';
+              iconColor = '#F87171';
+              bgGlow = 'rgba(140, 28, 19, 0.25)';
+            } else if (n.type === 'monthly_report') {
+              iconClass = 'fa-stamp';
+              iconColor = '#34D399';
+              bgGlow = 'rgba(16, 185, 129, 0.2)';
+            } else if (n.type === 'recurring_due') {
+              iconClass = 'fa-clock';
+              iconColor = '#38BDF8';
+              bgGlow = 'rgba(14, 165, 233, 0.2)';
+            }
+          %>
+          <div class="apple-reveal notification-card" style="display: flex; align-items: flex-start; gap: 16px; padding: 18px 20px; border-radius: 14px; background: var(--bg-card); border: 1px solid var(--border-card); box-shadow: var(--shadow-sm); transition: all 0.25s ease;">
+            <div style="width: 46px; height: 46px; border-radius: 12px; background: <%= bgGlow %>; border: 1px solid var(--border-gold); display: flex; align-items: center; justify-content: center; font-size: 1.3rem; color: <%= iconColor %>; flex-shrink: 0;">
+              <i class="fa-solid <%= iconClass %>"></i>
+            </div>
+            <div style="flex: 1;">
+              <div style="display: flex; align-items: center; justify-content: space-between; gap: 10px; margin-bottom: 4px;">
+                <h4 style="font-size: 1.05rem; font-weight: 700; margin: 0; color: <%= !n.is_read ? 'var(--text-main)' : 'var(--text-muted)' %>; font-family: 'Outfit', sans-serif;"><%= n.title %></h4>
+                <span style="font-size: 0.78rem; color: var(--text-subtle);">
+                  <%= new Date(n.created_at).toLocaleDateString() %> <%= new Date(n.created_at).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }) %>
+                </span>
+              </div>
+              <p style="font-size: 0.92rem; color: var(--text-main); margin-bottom: 10px; line-height: 1.5;"><%= n.message %></p>
+              <div style="display: flex; align-items: center; gap: 12px;">
+                <% if (n.link) { %>
+                  <a href="<%= n.link %>" class="btn btn-outline btn-sm" style="padding: 4px 12px; font-size: 0.8rem;">
+                    View Details &rarr;
+                  </a>
+                <% } %>
+                <% if (!n.is_read) { %>
+                  <span class="badge badge-gold" style="font-size: 0.72rem;">New</span>
+                <% } %>
+              </div>
+            </div>
+            <div>
+              <form action="/notifications/delete/<%= n.id %>" method="POST" style="margin: 0;">
+                <button type="submit" style="background: none; border: none; color: var(--text-subtle); cursor: pointer; padding: 6px; font-size: 1rem;" title="Dismiss">
+                  <i class="fa-solid fa-xmark"></i>
+                </button>
+              </form>
+            </div>
+          </div>
+        <% }); %>
+      <% } else { %>
+        <div style="text-align: center; padding: 60px 20px; color: var(--text-muted);">
+          <i class="fa-solid fa-bell-slash" style="font-size: 3rem; margin-bottom: 14px; color: var(--gold); opacity: 0.4;"></i>
+          <h3 style="font-family: 'Outfit', sans-serif; font-weight: 700; font-size: 1.35rem; color: var(--text-main); margin-bottom: 6px;">No Notifications</h3>
+          <p style="font-size: 0.92rem;">You're all caught up! Notifications and streak alerts will appear here.</p>
+        </div>
+      <% } %>
+    </div>
+  </div>
+</main>
+
+<%- include('partials/quick-add-modal') %>
+<%- include('partials/zero-spending-modal') %>
+<%- include('partials/footer') %>

@@ -1,0 +1,275 @@
+<nav class="navbar">
+  <div class="container nav-container">
+    <a href="<%= (typeof currentUser !== 'undefined' && currentUser) ? '/dashboard' : '/' %>" class="brand-logo">
+      <img src="/images/logo.svg?v=fintech_v3" alt="SpendWise Logo" class="brand-logo-img">
+      <div class="brand-text-block">
+        <span class="brand-name">Spend<span class="gold-foil">Wise</span></span>
+        <span class="brand-motto">Personal Finance</span>
+      </div>
+    </a>
+
+    <% if (typeof currentUser !== 'undefined' && currentUser) { %>
+      <ul class="nav-links">
+        <li>
+          <a href="/dashboard" class="nav-link <%= currentPath === '/dashboard' ? 'active' : '' %>">
+            <i class="fa-solid fa-table-columns"></i> Dashboard
+          </a>
+        </li>
+        <li>
+          <a href="/transactions" class="nav-link <%= currentPath === '/transactions' ? 'active' : '' %>">
+            <i class="fa-solid fa-receipt"></i> Transactions
+          </a>
+        </li>
+        <li>
+          <a href="/streaks" class="nav-link <%= currentPath === '/streaks' ? 'active' : '' %>">
+            <i class="fa-solid fa-fire streak-flame"></i> Streak
+          </a>
+        </li>
+        <li>
+          <a href="/analytics" class="nav-link <%= currentPath === '/analytics' ? 'active' : '' %>">
+            <i class="fa-solid fa-chart-pie"></i> Analytics
+          </a>
+        </li>
+        <li>
+          <a href="/budgets" class="nav-link <%= currentPath === '/budgets' ? 'active' : '' %>">
+            <i class="fa-solid fa-wallet"></i> Budgets
+          </a>
+        </li>
+        <li>
+          <a href="/recurring" class="nav-link <%= currentPath === '/recurring' ? 'active' : '' %>">
+            <i class="fa-solid fa-calendar-days"></i> Recurring
+          </a>
+        </li>
+        <li>
+          <a href="/reports" class="nav-link <%= (currentPath === '/reports' || currentPath === '/monthly-reports') ? 'active' : '' %>">
+            <i class="fa-solid fa-file-invoice"></i> Reports
+          </a>
+        </li>
+        <li>
+          <a href="/suggestions" class="nav-link <%= currentPath === '/suggestions' ? 'active' : '' %>">
+            <i class="fa-solid fa-wand-magic-sparkles"></i> Insights
+          </a>
+        </li>
+      </ul>
+
+      <div class="nav-actions">
+        <!-- Theme Palette Switcher -->
+        <div class="theme-dropdown">
+          <button type="button" class="btn btn-outline btn-sm" id="theme-menu-btn" title="Choose Theme Palette" onclick="window.SpendWise.toggleThemeMenu(event)">
+            <i class="fa-solid fa-palette"></i>
+          </button>
+          <div class="theme-menu" id="theme-menu">
+            <div style="font-size: 0.72rem; font-weight: 700; color: var(--gold); text-transform: uppercase; padding: 6px 10px; letter-spacing: 0.05em;">Aesthetic Themes</div>
+            <button type="button" class="theme-option-btn" onclick="window.SpendWise.setTheme('obsidian')">
+              <span class="theme-swatch" style="background: linear-gradient(135deg, #000000 50%, #38BDF8 50%); border-color: #38BDF8;"></span> Midnight Black
+            </button>
+            <button type="button" class="theme-option-btn" onclick="window.SpendWise.setTheme('royal')">
+              <span class="theme-swatch" style="background: linear-gradient(135deg, #FFFFFF 50%, #10B981 50%); border-color: #10B981;"></span> Emerald Mint (Light)
+            </button>
+            <button type="button" class="theme-option-btn" onclick="window.SpendWise.setTheme('pink')">
+              <span class="theme-swatch" style="background: linear-gradient(135deg, #FBCFE8 50%, #EC4899 50%); border-color: #EC4899;"></span> Sakura Blossom (Pink)
+            </button>
+            <button type="button" class="theme-option-btn" onclick="window.SpendWise.setTheme('lavender')">
+              <span class="theme-swatch" style="background: linear-gradient(135deg, #DDD6FE 50%, #8B5CF6 50%); border-color: #8B5CF6;"></span> Lavender Dream (Lilac)
+            </button>
+          </div>
+        </div>
+
+        <!-- Quick Add Modal Trigger (Desktop/Laptop) -->
+        <button class="btn btn-primary btn-sm desktop-only-action" data-open-modal="quick-add-modal">
+          <i class="fa-solid fa-plus"></i> Add
+        </button>
+
+        <!-- Notifications Bell -->
+        <a href="/notifications" class="btn btn-outline btn-sm notif-btn" style="position: relative; padding: 8px 12px;" title="Notifications">
+          <i class="fa-solid fa-bell"></i>
+          <span id="notif-badge-count" class="badge badge-crimson" style="position: absolute; top: -6px; right: -6px; padding: 2px 6px; font-size: 0.72rem; <%= (typeof unreadCount !== 'undefined' && unreadCount > 0) ? '' : 'display: none;' %>">
+            <%= typeof unreadCount !== 'undefined' ? unreadCount : 0 %>
+          </span>
+        </a>
+
+        <!-- Profile Link (Desktop/Laptop) -->
+        <a href="/profile" class="btn btn-outline btn-sm desktop-user-btn" style="gap: 6px;">
+          <i class="fa-solid fa-circle-user"></i>
+          <span class="user-greeting-name"><%= currentUser.name.split(' ')[0] %></span>
+        </a>
+
+        <!-- Sign Out (Desktop/Laptop) -->
+        <a href="/auth/logout" class="btn btn-outline btn-sm desktop-only-action" title="Sign Out">
+          <i class="fa-solid fa-arrow-right-from-bracket"></i>
+        </a>
+
+        <!-- Mobile & Tablet Hamburger Toggle Button -->
+        <button type="button" class="btn btn-outline btn-sm mobile-hamburger-btn" id="mobile-menu-toggle" aria-label="Toggle navigation menu" onclick="window.SpendWise.toggleMobileMenu()">
+          <i class="fa-solid fa-bars"></i>
+        </button>
+      </div>
+    <% } else { %>
+      <div class="nav-actions">
+        <!-- Theme Palette Switcher -->
+        <div class="theme-dropdown">
+          <button type="button" class="btn btn-outline btn-sm" title="Choose Theme Palette" onclick="window.SpendWise.toggleThemeMenu(event)">
+            <i class="fa-solid fa-palette"></i>
+          </button>
+          <div class="theme-menu" id="theme-menu-guest">
+            <div style="font-size: 0.72rem; font-weight: 700; color: var(--gold); text-transform: uppercase; padding: 6px 10px; letter-spacing: 0.05em;">Aesthetic Themes</div>
+            <button type="button" class="theme-option-btn" onclick="window.SpendWise.setTheme('obsidian')">
+              <span class="theme-swatch" style="background: linear-gradient(135deg, #000000 50%, #38BDF8 50%); border-color: #38BDF8;"></span> Midnight Black
+            </button>
+            <button type="button" class="theme-option-btn" onclick="window.SpendWise.setTheme('royal')">
+              <span class="theme-swatch" style="background: linear-gradient(135deg, #FFFFFF 50%, #10B981 50%); border-color: #10B981;"></span> Emerald Mint (Light)
+            </button>
+            <button type="button" class="theme-option-btn" onclick="window.SpendWise.setTheme('pink')">
+              <span class="theme-swatch" style="background: linear-gradient(135deg, #FBCFE8 50%, #EC4899 50%); border-color: #EC4899;"></span> Sakura Blossom (Pink)
+            </button>
+            <button type="button" class="theme-option-btn" onclick="window.SpendWise.setTheme('lavender')">
+              <span class="theme-swatch" style="background: linear-gradient(135deg, #DDD6FE 50%, #8B5CF6 50%); border-color: #8B5CF6;"></span> Lavender Dream (Lilac)
+            </button>
+          </div>
+        </div>
+
+        <a href="/login" class="btn btn-outline btn-sm">Sign In</a>
+        <a href="/register" class="btn btn-primary btn-sm guest-join-btn">Get Started</a>
+
+        <button type="button" class="btn btn-outline btn-sm mobile-hamburger-btn" id="mobile-menu-toggle-guest" aria-label="Toggle navigation menu" onclick="window.SpendWise.toggleMobileMenu()">
+          <i class="fa-solid fa-bars"></i>
+        </button>
+      </div>
+    <% } %>
+  </div>
+</nav>
+
+<!-- Mobile & Tablet Slide-out Drawer Navigation -->
+<div class="mobile-drawer-backdrop" id="mobile-drawer-backdrop" onclick="window.SpendWise.closeMobileMenu()"></div>
+<aside class="mobile-nav-drawer" id="mobile-nav-drawer" aria-label="Mobile Navigation">
+  <div class="mobile-drawer-header">
+    <div class="mobile-drawer-brand">
+      <img src="/images/logo.svg?v=fintech_v3" alt="SpendWise Logo">
+      <div>
+        <div class="mobile-brand-title">Spend<span class="gold-foil">Wise</span></div>
+        <div class="mobile-brand-motto">Personal Finance</div>
+      </div>
+    </div>
+    <button type="button" class="mobile-drawer-close" onclick="window.SpendWise.closeMobileMenu()" aria-label="Close Navigation">
+      <i class="fa-solid fa-xmark"></i>
+    </button>
+  </div>
+
+  <% if (typeof currentUser !== 'undefined' && currentUser) { %>
+    <!-- User Card in Drawer -->
+    <div class="mobile-user-card">
+      <div class="mobile-user-avatar">
+        <i class="fa-solid fa-user"></i>
+      </div>
+      <div style="flex: 1; min-width: 0;">
+        <div class="mobile-user-name"><%= currentUser.name %></div>
+        <div class="mobile-user-sub"><%= currentUser.email %></div>
+      </div>
+      <a href="/profile" class="btn btn-outline btn-sm" style="padding: 4px 8px; font-size: 0.78rem;" onclick="window.SpendWise.closeMobileMenu()">Profile</a>
+    </div>
+
+    <!-- Quick Action In Mobile Menu -->
+    <div class="mobile-quick-actions">
+      <button class="btn btn-primary btn-sm" style="flex: 1; justify-content: center;" data-open-modal="quick-add-modal" onclick="window.SpendWise.closeMobileMenu()">
+        <i class="fa-solid fa-plus"></i> Add Transaction
+      </button>
+      <a href="/notifications" class="btn btn-outline btn-sm" style="justify-content: center; position: relative;" onclick="window.SpendWise.closeMobileMenu()">
+        <i class="fa-solid fa-bell"></i>
+        <% if (typeof unreadCount !== 'undefined' && unreadCount > 0) { %>
+          <span class="badge badge-crimson" style="padding: 1px 5px; font-size: 0.68rem; margin-left: 4px;"><%= unreadCount %></span>
+        <% } %>
+      </a>
+    </div>
+
+    <!-- Navigation Links -->
+    <nav class="mobile-links-list">
+      <div class="mobile-section-label">Finance & Tools</div>
+      <a href="/dashboard" class="mobile-nav-link <%= currentPath === '/dashboard' ? 'active' : '' %>" onclick="window.SpendWise.closeMobileMenu()">
+        <i class="fa-solid fa-table-columns"></i>
+        <span>Dashboard</span>
+      </a>
+      <a href="/transactions" class="mobile-nav-link <%= currentPath === '/transactions' ? 'active' : '' %>" onclick="window.SpendWise.closeMobileMenu()">
+        <i class="fa-solid fa-receipt"></i>
+        <span>Transactions</span>
+      </a>
+      <a href="/streaks" class="mobile-nav-link <%= currentPath === '/streaks' ? 'active' : '' %>" onclick="window.SpendWise.closeMobileMenu()">
+        <i class="fa-solid fa-fire streak-flame"></i>
+        <span>Habit Streak</span>
+      </a>
+      <a href="/analytics" class="mobile-nav-link <%= currentPath === '/analytics' ? 'active' : '' %>" onclick="window.SpendWise.closeMobileMenu()">
+        <i class="fa-solid fa-chart-pie"></i>
+        <span>Analytics</span>
+      </a>
+      <a href="/budgets" class="mobile-nav-link <%= currentPath === '/budgets' ? 'active' : '' %>" onclick="window.SpendWise.closeMobileMenu()">
+        <i class="fa-solid fa-wallet"></i>
+        <span>Budgets</span>
+      </a>
+      <a href="/recurring" class="mobile-nav-link <%= currentPath === '/recurring' ? 'active' : '' %>" onclick="window.SpendWise.closeMobileMenu()">
+        <i class="fa-solid fa-calendar-days"></i>
+        <span>Recurring Bills</span>
+      </a>
+      <a href="/reports" class="mobile-nav-link <%= (currentPath === '/reports' || currentPath === '/monthly-reports') ? 'active' : '' %>" onclick="window.SpendWise.closeMobileMenu()">
+        <i class="fa-solid fa-file-invoice"></i>
+        <span>Monthly Reports</span>
+      </a>
+      <a href="/suggestions" class="mobile-nav-link <%= currentPath === '/suggestions' ? 'active' : '' %>" onclick="window.SpendWise.closeMobileMenu()">
+        <i class="fa-solid fa-wand-magic-sparkles"></i>
+        <span>Smart Insights</span>
+      </a>
+
+      <div class="mobile-section-label" style="margin-top: 18px;">Aesthetic Themes</div>
+      <div class="mobile-palettes-grid">
+        <button type="button" class="mobile-palette-pill" onclick="window.SpendWise.setTheme('obsidian')">
+          <span class="theme-swatch" style="background: linear-gradient(135deg, #000000 50%, #38BDF8 50%); border-color: #38BDF8;"></span> Black
+        </button>
+        <button type="button" class="mobile-palette-pill" onclick="window.SpendWise.setTheme('royal')">
+          <span class="theme-swatch" style="background: linear-gradient(135deg, #FFFFFF 50%, #10B981 50%); border-color: #10B981;"></span> Mint
+        </button>
+        <button type="button" class="mobile-palette-pill" onclick="window.SpendWise.setTheme('pink')">
+          <span class="theme-swatch" style="background: linear-gradient(135deg, #FBCFE8 50%, #EC4899 50%); border-color: #EC4899;"></span> Pink
+        </button>
+        <button type="button" class="mobile-palette-pill" onclick="window.SpendWise.setTheme('lavender')">
+          <span class="theme-swatch" style="background: linear-gradient(135deg, #DDD6FE 50%, #8B5CF6 50%); border-color: #8B5CF6;"></span> Lilac
+        </button>
+      </div>
+
+      <div class="mobile-section-label" style="margin-top: 18px;">Account</div>
+      <a href="/profile" class="mobile-nav-link <%= currentPath === '/profile' ? 'active' : '' %>" onclick="window.SpendWise.closeMobileMenu()">
+        <i class="fa-solid fa-user-gear"></i>
+        <span>Profile & Settings</span>
+      </a>
+      <a href="/auth/logout" class="mobile-nav-link" style="color: #FB7185;">
+        <i class="fa-solid fa-arrow-right-from-bracket"></i>
+        <span>Sign Out</span>
+      </a>
+    </nav>
+  <% } else { %>
+    <nav class="mobile-links-list">
+      <div class="mobile-section-label">Welcome To SpendWise</div>
+      <a href="/login" class="mobile-nav-link" onclick="window.SpendWise.closeMobileMenu()">
+        <i class="fa-solid fa-right-to-bracket"></i>
+        <span>Sign In</span>
+      </a>
+      <a href="/register" class="mobile-nav-link active" onclick="window.SpendWise.closeMobileMenu()">
+        <i class="fa-solid fa-user-plus"></i>
+        <span>Create Account</span>
+      </a>
+
+      <div class="mobile-section-label" style="margin-top: 18px;">Aesthetic Themes</div>
+      <div class="mobile-palettes-grid">
+        <button type="button" class="mobile-palette-pill" onclick="window.SpendWise.setTheme('obsidian')">
+          <span class="theme-swatch" style="background: linear-gradient(135deg, #000000 50%, #38BDF8 50%); border-color: #38BDF8;"></span> Black
+        </button>
+        <button type="button" class="mobile-palette-pill" onclick="window.SpendWise.setTheme('royal')">
+          <span class="theme-swatch" style="background: linear-gradient(135deg, #FFFFFF 50%, #10B981 50%); border-color: #10B981;"></span> Mint
+        </button>
+        <button type="button" class="mobile-palette-pill" onclick="window.SpendWise.setTheme('pink')">
+          <span class="theme-swatch" style="background: linear-gradient(135deg, #FBCFE8 50%, #EC4899 50%); border-color: #EC4899;"></span> Pink
+        </button>
+        <button type="button" class="mobile-palette-pill" onclick="window.SpendWise.setTheme('lavender')">
+          <span class="theme-swatch" style="background: linear-gradient(135deg, #DDD6FE 50%, #8B5CF6 50%); border-color: #8B5CF6;"></span> Lilac
+        </button>
+      </div>
+    </nav>
+  <% } %>
+</aside>

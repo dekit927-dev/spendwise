@@ -1,0 +1,163 @@
+<%- include('partials/header') %>
+<%- include('partials/navbar') %>
+
+<main class="main-content">
+  <!-- Hero Section -->
+  <section style="padding: 60px 0 70px; text-align: center; position: relative;">
+    <div class="container" style="max-width: 980px;">
+      <!-- Modern Pill Badge -->
+      <div class="hero-reveal" style="display: inline-flex; align-items: center; gap: 10px; background: var(--brand-glow-subtle); border: 1px solid var(--border-gold); padding: 8px 22px; border-radius: 9999px; margin-bottom: 26px; box-shadow: var(--shadow-sm);">
+        <span class="badge badge-gold" style="font-size: 0.75rem;"><i class="fa-solid fa-wallet"></i> PERSONAL FINANCE</span>
+        <span style="font-size: 0.88rem; font-weight: 600; color: var(--gold-pale);">Smart Expense Tracking & Mindful Habit Building</span>
+      </div>
+
+      <h1 class="hero-reveal" style="font-size: clamp(2.4rem, 5vw, 4.2rem); line-height: 1.15; margin-bottom: 22px; letter-spacing: -0.04em; font-family: 'Outfit', sans-serif; font-weight: 800;">
+        Master Your Money with <br>
+        <span class="gold-foil">SpendWise</span>
+      </h1>
+
+      <p class="hero-reveal" style="font-size: 1.15rem; color: var(--text-muted); max-width: 720px; margin: 0 auto 36px; line-height: 1.7; font-weight: 400;">
+        The aesthetic personal finance app designed for mindful budgeting, zero-stress expense tracking, unbroken habit streaks, and smart automated insights.
+      </p>
+
+      <div class="hero-reveal" style="display: flex; align-items: center; justify-content: center; gap: 16px; flex-wrap: wrap; margin-bottom: 50px;">
+        <a href="/register" class="btn btn-primary btn-lg">
+          <i class="fa-solid fa-arrow-right"></i> Get Started Free
+        </a>
+        <a href="/login" class="btn btn-outline btn-lg">
+          <i class="fa-solid fa-bolt"></i> Explore Live Demo
+        </a>
+      </div>
+
+      <!-- App Preview Card -->
+      <div class="dzong-banner" style="text-align: left; margin-bottom: 20px;">
+        <div style="display: flex; align-items: center; justify-content: space-between; border-bottom: 1px solid var(--border-card); padding-bottom: 20px; margin-bottom: 24px; flex-wrap: wrap; gap: 16px;">
+          <div style="display: flex; align-items: center; gap: 16px;">
+            <img src="/images/logo.svg?v=fintech_v3" alt="SpendWise Emblem" style="width: 52px; height: 52px; border-radius: 14px; box-shadow: 0 0 18px var(--brand-glow);">
+            <div>
+              <h3 style="font-size: 1.35rem; margin: 0; font-weight: 700; color: var(--text-main);">Monthly Financial Snapshot</h3>
+              <span style="font-size: 0.86rem; color: var(--text-muted);">Personal Spending &bull; Daily Streak Active</span>
+            </div>
+          </div>
+          <div style="display: flex; align-items: center; gap: 10px; flex-wrap: wrap;">
+            <span class="badge badge-warning" style="font-size: 0.82rem; padding: 6px 14px;">
+              <i class="fa-solid fa-fire"></i> 7-Day Habit Streak
+            </span>
+            <span class="badge badge-success" style="font-size: 0.82rem; padding: 6px 14px;">
+              <i class="fa-solid fa-circle-check"></i> Zero Spending Today
+            </span>
+          </div>
+        </div>
+
+        <!-- Sample Financial Stats Grid -->
+        <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(220px, 1fr)); gap: 20px;">
+          <div style="background: var(--bg-surface-elevated); border: 1px solid var(--border-card); border-radius: 16px; padding: 20px;">
+            <div style="font-size: 0.78rem; color: var(--gold); font-weight: 700; text-transform: uppercase; letter-spacing: 0.05em;">Monthly Inflow</div>
+            <div style="font-size: 1.85rem; font-weight: 800; font-family: 'Outfit', sans-serif; color: var(--text-main); margin: 6px 0; letter-spacing: -0.03em;">Nu. 25,000.00</div>
+            <div style="font-size: 0.8rem; color: var(--text-muted);">Primary Income &bull; Active</div>
+          </div>
+
+          <div style="background: var(--bg-surface-elevated); border: 1px solid var(--border-card); border-radius: 16px; padding: 20px;">
+            <div style="font-size: 0.78rem; color: #FCA5A5; font-weight: 700; text-transform: uppercase; letter-spacing: 0.05em;">Monthly Expenses</div>
+            <div style="font-size: 1.85rem; font-weight: 800; font-family: 'Outfit', sans-serif; color: var(--text-main); margin: 6px 0; letter-spacing: -0.03em;">Nu. 18,000.00</div>
+            <div style="font-size: 0.8rem; color: var(--text-muted);">Disciplined across categories</div>
+          </div>
+
+          <div style="background: rgba(16, 185, 129, 0.12); border: 1px solid rgba(16, 185, 129, 0.35); border-radius: 16px; padding: 20px;">
+            <div style="font-size: 0.78rem; color: #34D399; font-weight: 700; text-transform: uppercase; letter-spacing: 0.05em;">Saved This Month</div>
+            <div style="font-size: 1.85rem; font-weight: 800; font-family: 'Outfit', sans-serif; color: #34D399; margin: 6px 0; letter-spacing: -0.03em;">Nu. 7,000.00</div>
+            <div style="font-size: 0.8rem; color: #A7F3D0;">+28% retained for future goals</div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- Clean Minimalist Divider -->
+  <div class="container">
+    <div style="height: 1px; width: 100%; background: linear-gradient(90deg, transparent, var(--border-card), transparent); margin: 20px 0 50px;"></div>
+  </div>
+
+  <!-- Core Features Section -->
+  <section style="padding: 10px 0 80px;">
+    <div class="container">
+      <div class="apple-reveal" style="text-align: center; margin-bottom: 50px;">
+        <span class="badge badge-gold" style="margin-bottom: 12px;">FEATURES</span>
+        <h2 style="font-size: 2.3rem; font-weight: 800; letter-spacing: -0.03em;">Designed for Financial Clarity</h2>
+        <p style="color: var(--text-muted); max-width: 600px; margin: 10px auto 0; font-size: 1rem;">
+          Gamified habit tracking, automated alerts, and personalized recommendations to help you save more.
+        </p>
+      </div>
+
+      <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(min(100%, 280px), 1fr)); gap: 28px;">
+        <!-- Feature 1 -->
+        <div class="glass-panel" style="padding: 30px;">
+          <div style="width: 48px; height: 48px; border-radius: 14px; background: rgba(245, 158, 11, 0.15); border: 1px solid rgba(245, 158, 11, 0.3); display: flex; align-items: center; justify-content: center; font-size: 1.4rem; color: #F59E0B; margin-bottom: 20px;">
+            <i class="fa-solid fa-fire"></i>
+          </div>
+          <h3 style="font-size: 1.35rem; margin-bottom: 10px; font-weight: 700; color: var(--text-main);">Daily Habit Streaks</h3>
+          <p style="color: var(--text-muted); font-size: 0.94rem; line-height: 1.6;">
+            Keep your tracking habit glowing every day. Maintain consecutive logging days, earn achievement badges, and log zero-spending days.
+          </p>
+        </div>
+
+        <!-- Feature 2 -->
+        <div class="glass-panel" style="padding: 30px;">
+          <div style="width: 48px; height: 48px; border-radius: 14px; background: rgba(16, 185, 129, 0.15); border: 1px solid rgba(16, 185, 129, 0.3); display: flex; align-items: center; justify-content: center; font-size: 1.4rem; color: #10B981; margin-bottom: 20px;">
+            <i class="fa-solid fa-wand-magic-sparkles"></i>
+          </div>
+          <h3 style="font-size: 1.35rem; margin-bottom: 10px; font-weight: 700; color: var(--text-main);">Smart Financial Insights</h3>
+          <p style="color: var(--text-muted); font-size: 0.94rem; line-height: 1.6;">
+            Intelligent analysis of your monthly spending patterns with actionable suggestions — from curbing discretionary expenses to optimizing recurring bills.
+          </p>
+        </div>
+
+        <!-- Feature 3 -->
+        <div class="glass-panel" style="padding: 30px;">
+          <div style="width: 48px; height: 48px; border-radius: 14px; background: rgba(139, 92, 246, 0.15); border: 1px solid rgba(139, 92, 246, 0.3); display: flex; align-items: center; justify-content: center; font-size: 1.4rem; color: #8B5CF6; margin-bottom: 20px;">
+            <i class="fa-solid fa-chart-pie"></i>
+          </div>
+          <h3 style="font-size: 1.35rem; margin-bottom: 10px; font-weight: 700; color: var(--text-main);">Visual Spending Analytics</h3>
+          <p style="color: var(--text-muted); font-size: 0.94rem; line-height: 1.6;">
+            Interactive Chart.js visualizations: category breakdowns, multi-month trends, daily spending heatmaps, and financial wellness scores.
+          </p>
+        </div>
+
+        <!-- Feature 4 -->
+        <div class="glass-panel" style="padding: 30px;">
+          <div style="width: 48px; height: 48px; border-radius: 14px; background: rgba(6, 182, 212, 0.15); border: 1px solid rgba(6, 182, 212, 0.3); display: flex; align-items: center; justify-content: center; font-size: 1.4rem; color: #06B6D4; margin-bottom: 20px;">
+            <i class="fa-solid fa-bell"></i>
+          </div>
+          <h3 style="font-size: 1.35rem; margin-bottom: 10px; font-weight: 700; color: var(--text-main);">Real-Time Alerts</h3>
+          <p style="color: var(--text-muted); font-size: 0.94rem; line-height: 1.6;">
+            Instant notifications powered by Socket.IO when approaching budget limits, unlocking streak milestones, or preparing for recurring bills.
+          </p>
+        </div>
+
+        <!-- Feature 5 -->
+        <div class="glass-panel" style="padding: 30px;">
+          <div style="width: 48px; height: 48px; border-radius: 14px; background: rgba(236, 72, 153, 0.15); border: 1px solid rgba(236, 72, 153, 0.3); display: flex; align-items: center; justify-content: center; font-size: 1.4rem; color: #EC4899; margin-bottom: 20px;">
+            <i class="fa-solid fa-file-invoice"></i>
+          </div>
+          <h3 style="font-size: 1.35rem; margin-bottom: 10px; font-weight: 700; color: var(--text-main);">Monthly Statements</h3>
+          <p style="color: var(--text-muted); font-size: 0.94rem; line-height: 1.6;">
+            Automatic month-end financial reviews summarizing total inflows, outflows, highest expense areas, and printable statements.
+          </p>
+        </div>
+
+        <!-- Feature 6 -->
+        <div class="glass-panel" style="padding: 30px;">
+          <div style="width: 48px; height: 48px; border-radius: 14px; background: rgba(249, 115, 22, 0.15); border: 1px solid rgba(249, 115, 22, 0.3); display: flex; align-items: center; justify-content: center; font-size: 1.4rem; color: #F97316; margin-bottom: 20px;">
+            <i class="fa-solid fa-calendar-check"></i>
+          </div>
+          <h3 style="font-size: 1.35rem; margin-bottom: 10px; font-weight: 700; color: var(--text-main);">Recurring Subscriptions</h3>
+          <p style="color: var(--text-muted); font-size: 0.94rem; line-height: 1.6;">
+            Keep track of utility bills, internet fiber, rent, and subscriptions with automated reminders so you never miss a due date.
+          </p>
+        </div>
+      </div>
+    </div>
+  </section>
+</main>
+
+<%- include('partials/footer') %>

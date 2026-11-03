@@ -1,0 +1,423 @@
+<%- include('partials/header') %>
+<%- include('partials/navbar') %>
+
+<main class="main-content">
+  <div class="container">
+    
+    <% if (query && query.welcome) { %>
+      <div style="background: rgba(16, 185, 129, 0.15); border: 1px solid rgba(16, 185, 129, 0.35); color: #34D399; padding: 16px 22px; border-radius: 16px; font-size: 0.96rem; margin-bottom: 24px; display: flex; align-items: center; justify-content: space-between; flex-wrap: wrap; gap: 12px; box-shadow: var(--shadow-sm);">
+        <div style="display: flex; align-items: center; gap: 12px;">
+          <div style="width: 36px; height: 36px; border-radius: 10px; background: rgba(16, 185, 129, 0.2); display: flex; align-items: center; justify-content: center; font-size: 1.2rem; color: #10B981;">
+            <i class="fa-solid fa-sparkles"></i>
+          </div>
+          <div>
+            <strong>Welcome, <%= currentUser.name %>!</strong>
+            <div style="font-size: 0.84rem; color: #A7F3D0;">Your personal SpendWise account is ready. Your habit streak tracking is active.</div>
+          </div>
+        </div>
+        <span class="badge badge-success"><i class="fa-solid fa-circle-check"></i> Account Ready</span>
+      </div>
+    <% } %>
+
+    <!-- Habit Streak Banner -->
+    <div class="dzong-banner" style="margin-bottom: 30px;">
+      <div style="display: flex; align-items: center; justify-content: space-between; flex-wrap: wrap; gap: 20px;">
+        <div style="display: flex; align-items: center; gap: 20px;">
+          <div style="width: 68px; height: 68px; border-radius: 18px; background: rgba(245, 158, 11, 0.18); border: 1px solid rgba(245, 158, 11, 0.4); display: flex; align-items: center; justify-content: center; font-size: 2.2rem; box-shadow: 0 0 24px rgba(245, 158, 11, 0.3); color: #F59E0B;">
+            <i class="fa-solid fa-fire"></i>
+          </div>
+          <div>
+            <div style="display: flex; align-items: center; gap: 12px; margin-bottom: 4px; flex-wrap: wrap;">
+              <span class="badge badge-gold" style="font-size: 0.74rem;">DAILY HABIT STREAK</span>
+              <h2 style="font-size: 1.85rem; margin: 0; font-weight: 800; letter-spacing: -0.03em; color: var(--text-main);">
+                <%= streak ? streak.current_streak : 0 %> Consecutive Days Active!
+              </h2>
+              <% if (hasLoggedToday) { %>
+                <span class="badge badge-success"><i class="fa-solid fa-circle-check"></i> Logged Today</span>
+              <% } else { %>
+                <span class="badge badge-warning"><i class="fa-solid fa-clock"></i> Pending Today</span>
+              <% } %>
+            </div>
+            <p style="color: var(--text-muted); font-size: 0.94rem; margin: 0; max-width: 650px;">
+              <% if (hasLoggedToday) { %>
+                Great job, <%= currentUser.name.split(' ')[0] %>! Your tracking streak is secure for today.
+              <% } else { %>
+                Keep your financial tracking habit alive! Add an expense or confirm zero spending today to extend your streak.
+              <% } %>
+            </p>
+          </div>
+        </div>
+
+        <div style="display: flex; align-items: center; gap: 12px; flex-wrap: wrap;">
+          <button class="btn btn-primary" data-open-modal="quick-add-modal">
+            <i class="fa-solid fa-plus"></i> Add Transaction
+          </button>
+          <% if (!hasLoggedToday) { %>
+            <button class="btn btn-outline" data-open-modal="zero-spending-modal">
+              <i class="fa-solid fa-shield-halved"></i> No Spending Today
+            </button>
+          <% } %>
+          <a href="/streaks" class="btn btn-outline">
+            <i class="fa-solid fa-award"></i> Badges
+          </a>
+        </div>
+      </div>
+    </div>
+
+    <!-- Metrics Cards Grid -->
+    <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(250px, 1fr)); gap: 22px; margin-bottom: 30px;">
+      
+      <!-- Income Card -->
+      <div class="glass-panel metric-card" style="border-top: 3px solid var(--gold);">
+        <div class="metric-label">
+          <i class="fa-solid fa-arrow-trend-up" style="color: var(--gold);"></i> Monthly Inflow
+        </div>
+        <div class="metric-value" style="color: var(--text-main);">
+          <%= currency %> <%= totals.total_income.toLocaleString(undefined, {minimumFractionDigits: 2, maximumFractionDigits: 2}) %>
+        </div>
+        <div class="metric-sub">
+          Salary &bull; Inflow &bull; Side Income
+        </div>
+      </div>
+
+      <!-- Expenses Card -->
+      <div class="glass-panel metric-card" style="border-top: 3px solid #EF4444;">
+        <div class="metric-label">
+          <i class="fa-solid fa-receipt" style="color: #F87171;"></i> Total Expenses
+        </div>
+        <div class="metric-value" style="color: var(--text-main);">
+          <%= currency %> <%= totals.total_expense.toLocaleString(undefined, {minimumFractionDigits: 2, maximumFractionDigits: 2}) %>
+        </div>
+        <div class="metric-sub">
+          Across Food, Bills, Shopping & Life
+        </div>
+      </div>
+
+      <!-- Net Savings Card -->
+      <div class="glass-panel metric-card" style="border-top: 3px solid <%= totals.net_savings >= 0 ? '#10B981' : '#E11D48' %>;">
+        <div class="metric-label">
+          <i class="fa-solid fa-vault" style="color: <%= totals.net_savings >= 0 ? '#34D399' : '#FB7185' %>;"></i> Net Savings
+        </div>
+        <div class="metric-value" style="color: <%= totals.net_savings >= 0 ? '#34D399' : '#FB7185' %>;">
+          <%= currency %> <%= totals.net_savings.toLocaleString(undefined, {minimumFractionDigits: 2, maximumFractionDigits: 2}) %>
+        </div>
+        <div class="metric-sub">
+          <% const sRate = totals.total_income > 0 ? Math.round((totals.net_savings / totals.total_income) * 100) : 0; %>
+          <i class="fa-solid fa-piggy-bank"></i> <%= sRate %>% of income saved
+        </div>
+      </div>
+
+      <!-- Longest Habit Streak -->
+      <div class="glass-panel metric-card" style="border-top: 3px solid #F59E0B;">
+        <div class="metric-label">
+          <i class="fa-solid fa-trophy" style="color: #F59E0B;"></i> Habit Streak
+        </div>
+        <div class="metric-value" style="color: #FBBF24;">
+          <%= streak ? streak.longest_streak : 0 %> Days Record
+        </div>
+        <div class="metric-sub">
+          Total <%= streak ? streak.total_days_tracked : 0 %> days logged
+        </div>
+      </div>
+    </div>
+
+    <!-- Real-Time Cash Flow Calendar Section (Big, Prominent, Fully Responsive) -->
+    <section class="glass-panel apple-reveal calendar-card" id="dashboard-calendar-card">
+      <div class="calendar-top-bar">
+        <div class="calendar-title-wrap">
+          <h2 class="calendar-title-main">
+            <i class="fa-solid fa-calendar-days" style="color: var(--brand-primary);"></i>
+            Cash Flow Calendar
+            <span class="badge badge-success" style="font-size: 0.72rem; padding: 4px 10px;">
+              <i class="fa-solid fa-bolt"></i> Live Real-Time
+            </span>
+          </h2>
+          <span class="calendar-sub">
+            Overview of daily income deposits, daily expenses, and zero-spend habits &bull; Click any day for itemized breakdown
+          </span>
+        </div>
+
+        <div class="calendar-controls">
+          <!-- Month Switcher Controls -->
+          <div class="calendar-nav-group">
+            <button type="button" class="cal-nav-btn" id="cal-prev-btn" title="Previous Month">
+              <i class="fa-solid fa-chevron-left"></i>
+            </button>
+            <span class="cal-current-label" id="cal-current-label"><%= currentMonthKey %></span>
+            <button type="button" class="cal-nav-btn" id="cal-next-btn" title="Next Month">
+              <i class="fa-solid fa-chevron-right"></i>
+            </button>
+          </div>
+          <button type="button" class="btn btn-outline btn-sm" id="cal-today-btn" style="height: 44px; padding: 0 16px;">
+            <i class="fa-solid fa-calendar-day"></i> Today
+          </button>
+        </div>
+
+        <!-- Monthly Live Totals -->
+        <div class="calendar-totals-bar">
+          <div class="cal-stat-badge inflow">
+            <i class="fa-solid fa-arrow-up"></i>
+            <span>Inflow:</span>
+            <strong id="cal-total-inflow">+<%= currency %> <%= totals.total_income.toLocaleString(undefined, {minimumFractionDigits: 2}) %></strong>
+          </div>
+          <div class="cal-stat-badge outflow">
+            <i class="fa-solid fa-arrow-down"></i>
+            <span>Outflow:</span>
+            <strong id="cal-total-outflow">-<%= currency %> <%= totals.total_expense.toLocaleString(undefined, {minimumFractionDigits: 2}) %></strong>
+          </div>
+          <div class="cal-stat-badge net">
+            <i class="fa-solid fa-vault"></i>
+            <span>Net:</span>
+            <strong id="cal-total-net"><%= totals.net_savings >= 0 ? '+' : '-' %><%= currency %> <%= Math.abs(totals.net_savings).toLocaleString(undefined, {minimumFractionDigits: 2}) %></strong>
+          </div>
+        </div>
+      </div>
+
+      <!-- Weekdays Header Row (Monday Start) -->
+      <div class="calendar-weekdays-row">
+        <div class="cal-weekday">Mon</div>
+        <div class="cal-weekday">Tue</div>
+        <div class="cal-weekday">Wed</div>
+        <div class="cal-weekday">Thu</div>
+        <div class="cal-weekday">Fri</div>
+        <div class="cal-weekday">Sat</div>
+        <div class="cal-weekday">Sun</div>
+      </div>
+
+      <!-- 7-Column Days Grid -->
+      <div class="calendar-days-grid" id="cal-days-grid">
+        <!-- Rendered dynamically by SpendWiseCalendar -->
+      </div>
+    </section>
+
+    <!-- Mid Section: Budget Progress + Smart Insights -->
+    <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(min(100%, 320px), 1fr)); gap: 26px; margin-bottom: 30px;">
+      
+      <!-- Budget Utilization Card -->
+      <div class="glass-panel" style="padding: 28px;">
+        <div style="display: flex; align-items: center; justify-content: space-between; margin-bottom: 22px;">
+          <h3 style="font-size: 1.25rem; display: flex; align-items: center; gap: 10px; font-weight: 700; color: var(--text-main); margin: 0;">
+            <i class="fa-solid fa-scale-balanced" style="color: var(--gold);"></i> Monthly Budget
+          </h3>
+          <a href="/budgets" class="btn btn-outline btn-sm">Configure</a>
+        </div>
+
+        <% if (budgetSummary.overall) { %>
+          <div style="background: var(--bg-surface-elevated); border: 1px solid var(--border-card); border-radius: 14px; padding: 18px; margin-bottom: 22px;">
+            <div style="display: flex; justify-content: space-between; font-size: 0.94rem; font-weight: 600; margin-bottom: 8px;">
+              <span>Overall Monthly Budget</span>
+              <span style="font-family: 'Outfit', sans-serif; font-weight: 700; color: var(--text-main);"><%= currency %> <%= budgetSummary.overall.spent_amount.toLocaleString() %> / <%= budgetSummary.overall.budget_amount.toLocaleString() %></span>
+            </div>
+            
+            <!-- Progress Bar -->
+            <div style="background: rgba(255, 255, 255, 0.08); height: 10px; border-radius: 9999px; overflow: hidden; margin-bottom: 8px; border: 1px solid var(--border-subtle);">
+              <div style="height: 100%; width: <%= Math.min(budgetSummary.overall.percentage_used, 100) %>%; background: <%= budgetSummary.overall.is_exceeded ? 'linear-gradient(90deg, #F87171, #EF4444)' : 'linear-gradient(90deg, #10B981, #06B6D4)' %>; border-radius: 9999px; transition: width 0.4s ease;"></div>
+            </div>
+
+            <div style="display: flex; justify-content: space-between; font-size: 0.82rem; color: var(--text-muted);">
+              <span><%= budgetSummary.overall.percentage_used %>% Used</span>
+              <span>Available: <strong style="color: #34D399;"><%= currency %> <%= Math.max(0, budgetSummary.overall.remaining_amount).toLocaleString() %></strong></span>
+            </div>
+          </div>
+        <% } %>
+
+        <div style="display: flex; flex-direction: column; gap: 14px;">
+          <% if (budgetSummary.categoryBudgets && budgetSummary.categoryBudgets.length > 0) { %>
+            <% budgetSummary.categoryBudgets.slice(0, 3).forEach(b => { %>
+              <div style="background: var(--bg-surface-elevated); border: 1px solid var(--border-card); border-radius: 12px; padding: 12px 16px;">
+                <div style="display: flex; justify-content: space-between; font-size: 0.88rem; margin-bottom: 6px;">
+                  <span style="font-weight: 600; display: flex; align-items: center; gap: 6px;">
+                    <i class="fa-solid <%= b.category_icon || 'fa-tag' %>" style="color: <%= b.category_color || 'var(--gold)' %>;"></i>
+                    <%= b.category_name %>
+                  </span>
+                  <span style="font-family: 'Outfit', sans-serif; font-weight: 600;">
+                    <%= currency %> <%= b.spent_amount.toLocaleString() %> / <%= b.budget_amount.toLocaleString() %>
+                    <% if (b.is_exceeded) { %>
+                      <span class="badge badge-crimson" style="margin-left: 6px; font-size: 0.7rem;">Exceeded</span>
+                    <% } %>
+                  </span>
+                </div>
+                <div style="background: rgba(255, 255, 255, 0.08); height: 7px; border-radius: 9999px; overflow: hidden;">
+                  <div style="height: 100%; width: <%= Math.min(b.percentage_used, 100) %>%; background: <%= b.is_exceeded ? '#EF4444' : (b.is_near_limit ? '#F59E0B' : '#10B981') %>; border-radius: 9999px;"></div>
+                </div>
+              </div>
+            <% }); %>
+          <% } else { %>
+            <p style="color: var(--text-muted); font-size: 0.88rem;">No category budgets set for this month.</p>
+          <% } %>
+        </div>
+      </div>
+
+      <!-- Financial Insights Preview -->
+      <div class="glass-panel" style="padding: 28px;">
+        <div style="display: flex; align-items: center; justify-content: space-between; margin-bottom: 22px;">
+          <h3 style="font-size: 1.25rem; display: flex; align-items: center; gap: 10px; font-weight: 700; color: var(--text-main); margin: 0;">
+            <i class="fa-solid fa-wand-magic-sparkles" style="color: var(--gold);"></i> Smart Insights
+          </h3>
+          <a href="/suggestions" class="btn btn-outline btn-sm">All Insights</a>
+        </div>
+
+        <% if (latestSuggestions && latestSuggestions.length > 0) { %>
+          <div style="display: flex; flex-direction: column; gap: 16px;">
+            <% latestSuggestions.slice(0, 2).forEach(s => { %>
+              <div style="background: var(--bg-surface-elevated); border: 1px solid var(--border-card); border-radius: 14px; padding: 18px;">
+                <div style="display: flex; justify-content: space-between; align-items: flex-start; margin-bottom: 6px; gap: 10px;">
+                  <h4 style="font-size: 1.02rem; font-weight: 700; color: var(--text-main); margin: 0;"><%= s.title %></h4>
+                  <% if (s.potential_saving > 0) { %>
+                    <span class="badge badge-success">+<%= currency %> <%= parseFloat(s.potential_saving).toLocaleString() %></span>
+                  <% } %>
+                </div>
+                <div style="font-size: 0.78rem; color: var(--gold); text-transform: uppercase; letter-spacing: 0.04em; margin-bottom: 6px;">
+                  <i class="fa-solid fa-chart-line"></i> Pattern: <%= s.current_pattern %>
+                </div>
+                <p style="font-size: 0.9rem; color: var(--text-muted); margin: 0; line-height: 1.5;">
+                  <%= s.suggestion_text %>
+                </p>
+              </div>
+            <% }); %>
+          </div>
+        <% } else { %>
+          <div style="text-align: center; padding: 30px; color: var(--text-muted);">
+            <i class="fa-solid fa-wand-magic-sparkles" style="font-size: 2.2rem; color: var(--gold); opacity: 0.5; margin-bottom: 12px;"></i>
+            <p style="font-size: 0.92rem;">Log daily expenses to unlock personalized smart financial advice!</p>
+          </div>
+        <% } %>
+      </div>
+    </div>
+
+    <!-- Bottom Section: Recent Transactions + Upcoming Recurring Bills -->
+    <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(min(100%, 320px), 1fr)); gap: 26px;">
+      
+      <!-- Recent Transactions -->
+      <div class="glass-panel" style="padding: 28px;">
+        <div style="display: flex; align-items: center; justify-content: space-between; margin-bottom: 22px;">
+          <h3 style="font-size: 1.25rem; display: flex; align-items: center; gap: 10px; font-weight: 700; color: var(--text-main); margin: 0;">
+            <i class="fa-solid fa-receipt" style="color: var(--gold);"></i> Recent Transactions
+          </h3>
+          <a href="/transactions" class="btn btn-outline btn-sm">View All</a>
+        </div>
+
+        <% if (recentTransactions && recentTransactions.length > 0) { %>
+          <div class="data-table-wrapper">
+            <table class="data-table">
+              <tbody>
+                <% recentTransactions.forEach(t => { %>
+                  <tr class="apple-row-reveal">
+                    <td style="width: 44px; padding-right: 0;">
+                      <div style="width: 38px; height: 38px; border-radius: 12px; background: <%= t.category_color ? t.category_color + '22' : 'rgba(255,255,255,0.06)' %>; display: flex; align-items: center; justify-content: center; color: <%= t.category_color || 'var(--gold)' %>; border: 1px solid var(--border-card);">
+                        <i class="fa-solid <%= t.category_icon || 'fa-tag' %>"></i>
+                      </div>
+                    </td>
+                    <td>
+                      <div style="font-weight: 600; color: var(--text-main);"><%= t.description %></div>
+                      <div style="font-size: 0.78rem; color: var(--text-subtle);">
+                        <%= new Date(t.transaction_date).toLocaleDateString() %> &bull; <%= t.payment_method %>
+                      </div>
+                    </td>
+                    <td style="text-align: right; font-weight: 700; font-family: 'Outfit', sans-serif; font-size: 1.05rem; color: <%= t.type === 'income' ? '#34D399' : '#FCA5A5' %>; letter-spacing: -0.02em;">
+                      <%= t.type === 'income' ? '+' : '-' %> <%= currency %> <%= parseFloat(t.amount).toLocaleString(undefined, {minimumFractionDigits: 2}) %>
+                    </td>
+                  </tr>
+                <% }); %>
+              </tbody>
+            </table>
+          </div>
+        <% } else { %>
+          <p style="color: var(--text-muted); font-size: 0.88rem;">No transactions recorded yet. Click "Add Transaction" above!</p>
+        <% } %>
+      </div>
+
+      <!-- Upcoming Bills -->
+      <div class="glass-panel" style="padding: 28px;">
+        <div style="display: flex; align-items: center; justify-content: space-between; margin-bottom: 22px;">
+          <h3 style="font-size: 1.25rem; display: flex; align-items: center; gap: 10px; font-weight: 700; color: var(--text-main); margin: 0;">
+            <i class="fa-solid fa-clock-rotate-left" style="color: var(--gold);"></i> Upcoming Bills & Utilities
+          </h3>
+          <a href="/recurring" class="btn btn-outline btn-sm">Manage</a>
+        </div>
+
+        <% if (upcomingBills && upcomingBills.length > 0) { %>
+          <div style="display: flex; flex-direction: column; gap: 14px;">
+            <% upcomingBills.forEach(b => { %>
+              <div style="display: flex; align-items: center; justify-content: space-between; padding: 14px 18px; border-radius: 14px; background: var(--bg-surface-elevated); border: 1px solid var(--border-card);">
+                <div>
+                  <div style="font-weight: 600; font-size: 0.96rem; color: var(--text-main);"><%= b.title %></div>
+                  <div style="font-size: 0.82rem; color: #F59E0B; margin-top: 2px;">
+                    <i class="fa-solid fa-calendar-day"></i> Due on <%= new Date(b.next_due_date).toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' }) %>
+                  </div>
+                </div>
+                <div style="text-align: right;">
+                  <div style="font-weight: 700; font-family: 'Outfit', sans-serif; font-size: 1.15rem; color: var(--text-main); letter-spacing: -0.02em;">
+                    <%= currency %> <%= parseFloat(b.amount).toLocaleString() %>
+                  </div>
+                  <span class="badge badge-warning" style="font-size: 0.7rem; padding: 2px 8px;">Upcoming</span>
+                </div>
+              </div>
+            <% }); %>
+          </div>
+        <% } else { %>
+          <div style="padding: 28px; text-align: center; color: var(--text-muted);">
+            <i class="fa-solid fa-circle-check" style="color: #34D399; font-size: 2rem; margin-bottom: 10px;"></i>
+            <p style="font-size: 0.92rem;">All scheduled bills and recurring payments are up to date!</p>
+          </div>
+        <% } %>
+      </div>
+    </div>
+
+  </div>
+</main>
+
+<!-- Calendar Day Details Modal -->
+<div id="cal-day-modal" class="cal-modal-backdrop">
+  <div class="cal-modal-box">
+    <div class="cal-modal-header">
+      <div>
+        <span class="badge badge-gold" style="font-size: 0.72rem; margin-bottom: 4px;">DAILY CASH FLOW BREAKDOWN</span>
+        <h3 id="cal-modal-date-title" style="font-size: 1.3rem; font-weight: 800; margin: 0; color: var(--text-main); font-family: 'Plus Jakarta Sans', sans-serif;">
+          Date Details
+        </h3>
+      </div>
+      <button type="button" data-close-cal-modal style="background: none; border: none; font-size: 1.6rem; color: var(--text-muted); cursor: pointer; padding: 4px 8px; line-height: 1;">&times;</button>
+    </div>
+
+    <div class="cal-modal-body">
+      <!-- Day Summary Stats -->
+      <div style="display: grid; grid-template-columns: repeat(3, 1fr); gap: 12px; margin-bottom: 20px; background: var(--bg-surface-elevated); padding: 16px; border-radius: 16px; border: 1px solid var(--border-card);">
+        <div>
+          <div style="font-size: 0.72rem; color: #10B981; font-weight: 700; text-transform: uppercase; margin-bottom: 2px;">Total Inflow</div>
+          <div id="cal-modal-income" style="font-size: 1.15rem; font-weight: 800; color: #10B981; font-family: 'Plus Jakarta Sans', sans-serif;">+<%= currency %> 0.00</div>
+        </div>
+        <div>
+          <div style="font-size: 0.72rem; color: #EF4444; font-weight: 700; text-transform: uppercase; margin-bottom: 2px;">Total Outflow</div>
+          <div id="cal-modal-expense" style="font-size: 1.15rem; font-weight: 800; color: #EF4444; font-family: 'Plus Jakarta Sans', sans-serif;">-<%= currency %> 0.00</div>
+        </div>
+        <div>
+          <div style="font-size: 0.72rem; color: var(--text-muted); font-weight: 700; text-transform: uppercase; margin-bottom: 2px;">Day Net</div>
+          <div id="cal-modal-net" style="font-size: 1.15rem; font-weight: 800; color: var(--text-main); font-family: 'Plus Jakarta Sans', sans-serif;"><%= currency %> 0.00</div>
+        </div>
+      </div>
+
+      <!-- Transaction List Container -->
+      <div id="cal-modal-tx-list"></div>
+    </div>
+
+    <div style="padding: 18px 26px; border-top: 1px solid var(--border-card); display: flex; justify-content: space-between; align-items: center; background: var(--bg-surface-elevated); flex-wrap: wrap; gap: 12px;">
+      <button type="button" class="btn btn-outline btn-sm" data-close-cal-modal>Close</button>
+      <button type="button" class="btn btn-primary btn-sm" id="cal-modal-add-btn">
+        <i class="fa-solid fa-plus"></i> Add Transaction for this Date
+      </button>
+    </div>
+  </div>
+</div>
+
+<script src="/js/calendar.js?v=2026"></script>
+<script>
+  document.addEventListener('DOMContentLoaded', () => {
+    const initialCalendarData = <%- JSON.stringify(calendarData || {}) %>;
+    window.SpendWiseCalendar.init(initialCalendarData, '<%= currency %>');
+  });
+</script>
+
+<%- include('partials/quick-add-modal') %>
+<%- include('partials/zero-spending-modal') %>
+<%- include('partials/footer') %>

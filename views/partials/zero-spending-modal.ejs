@@ -1,0 +1,35 @@
+<!-- Zero Spending Confirmation Modal -->
+<div id="zero-spending-modal" class="modal-backdrop">
+  <div class="modal-box text-center" style="max-width: 480px;">
+    <div class="modal-header">
+      <h3 style="font-size: 1.25rem; display: flex; align-items: center; gap: 10px; font-weight: 700; color: var(--text-main);">
+        <i class="fa-solid fa-shield-check" style="color: #10B981;"></i> Confirm Zero Spending Today
+      </h3>
+      <button type="button" data-close-modal style="background: none; border: none; color: var(--text-muted); font-size: 1.4rem; cursor: pointer;">&times;</button>
+    </div>
+    <form action="/transactions/zero-spending" method="POST">
+      <div class="modal-body" style="text-align: center; padding: 30px 24px;">
+        <div style="width: 72px; height: 72px; border-radius: 20px; background: rgba(16, 185, 129, 0.15); border: 1px solid rgba(16, 185, 129, 0.4); margin: 0 auto 18px; display: flex; align-items: center; justify-content: center; font-size: 2.2rem; color: #10B981; box-shadow: 0 0 24px rgba(16, 185, 129, 0.25);">
+          <i class="fa-solid fa-piggy-bank"></i>
+        </div>
+        <h4 style="font-family: 'Outfit', sans-serif; font-size: 1.4rem; font-weight: 700; color: var(--text-main); margin-bottom: 8px;">
+          Spent Nothing Today?
+        </h4>
+        <p style="color: var(--text-muted); font-size: 0.94rem; margin-bottom: 22px; line-height: 1.6;">
+          Celebrating no-spend days is a proven way to reach your savings targets faster. Confirming zero expenditure logs today and keeps your tracking streak going!
+        </p>
+
+        <div class="form-group" style="text-align: left;">
+          <label class="form-label">Notes (Optional)</label>
+          <input type="text" name="notes" class="form-control" placeholder="e.g. Cooked at home, spent 0 today!">
+        </div>
+      </div>
+      <div class="modal-footer" style="justify-content: center; gap: 14px;">
+        <button type="button" class="btn btn-outline" data-close-modal>Cancel</button>
+        <button type="submit" class="btn btn-primary">
+          <i class="fa-solid fa-circle-check"></i> Confirm No-Spend Day
+        </button>
+      </div>
+    </form>
+  </div>
+</div>

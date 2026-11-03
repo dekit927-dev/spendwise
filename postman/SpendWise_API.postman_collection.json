@@ -1,0 +1,282 @@
+{
+  "info": {
+    "name": "SpendWise API Collection",
+    "description": "Comprehensive REST API Collection for SpendWise – Smart Personal Finance & Gamified Expense Tracking System",
+    "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
+  },
+  "variable": [
+    {
+      "key": "baseUrl",
+      "value": "http://localhost:3000",
+      "type": "string"
+    },
+    {
+      "key": "token",
+      "value": "",
+      "type": "string"
+    }
+  ],
+  "item": [
+    {
+      "name": "1. Authentication",
+      "item": [
+        {
+          "name": "Register User",
+          "request": {
+            "method": "POST",
+            "header": [{ "key": "Content-Type", "value": "application/json" }],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"name\": \"Deki Tshomo\",\n  \"email\": \"daki@spendwise.bt\",\n  \"password\": \"password123\",\n  \"currency\": \"Nu.\",\n  \"monthly_income\": 25000\n}"
+            },
+            "url": { "raw": "{{baseUrl}}/api/auth/register" }
+          }
+        },
+        {
+          "name": "Login User",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "const json = pm.response.json();",
+                  "if (json.token) {",
+                  "    pm.collectionVariables.set('token', json.token);",
+                  "}"
+                ],
+                "type": "text/javascript"
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [{ "key": "Content-Type", "value": "application/json" }],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"email\": \"demo@spendwise.bt\",\n  \"password\": \"password123\"\n}"
+            },
+            "url": { "raw": "{{baseUrl}}/api/auth/login" }
+          }
+        },
+        {
+          "name": "Get Profile",
+          "request": {
+            "method": "GET",
+            "header": [{ "key": "Authorization", "value": "Bearer {{token}}" }],
+            "url": { "raw": "{{baseUrl}}/api/auth/me" }
+          }
+        }
+      ]
+    },
+    {
+      "name": "2. Transactions",
+      "item": [
+        {
+          "name": "Get Transactions List",
+          "request": {
+            "method": "GET",
+            "header": [{ "key": "Authorization", "value": "Bearer {{token}}" }],
+            "url": { "raw": "{{baseUrl}}/api/transactions" }
+          }
+        },
+        {
+          "name": "Create Expense Transaction",
+          "request": {
+            "method": "POST",
+            "header": [
+              { "key": "Content-Type", "value": "application/json" },
+              { "key": "Authorization", "value": "Bearer {{token}}" }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"category_id\": 1,\n  \"type\": \"expense\",\n  \"amount\": 350.00,\n  \"description\": \"Cafeteria lunch & snacks\",\n  \"transaction_date\": \"2026-10-31\",\n  \"payment_method\": \"Mobile Banking\"\n}"
+            },
+            "url": { "raw": "{{baseUrl}}/api/transactions" }
+          }
+        },
+        {
+          "name": "Confirm Zero-Spending Day",
+          "request": {
+            "method": "POST",
+            "header": [
+              { "key": "Content-Type", "value": "application/json" },
+              { "key": "Authorization", "value": "Bearer {{token}}" }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"notes\": \"Confirmed zero spending! Cooked at home.\"\n}"
+            },
+            "url": { "raw": "{{baseUrl}}/api/transactions/zero-spending" }
+          }
+        }
+      ]
+    },
+    {
+      "name": "3. Daily Streaks",
+      "item": [
+        {
+          "name": "Get Streak Details & Badges",
+          "request": {
+            "method": "GET",
+            "header": [{ "key": "Authorization", "value": "Bearer {{token}}" }],
+            "url": { "raw": "{{baseUrl}}/api/streaks/status" }
+          }
+        },
+        {
+          "name": "Use Streak Freeze",
+          "request": {
+            "method": "POST",
+            "header": [{ "key": "Authorization", "value": "Bearer {{token}}" }],
+            "url": { "raw": "{{baseUrl}}/api/streaks/use-freeze" }
+          }
+        }
+      ]
+    },
+    {
+      "name": "4. Budgets",
+      "item": [
+        {
+          "name": "Get Budgets for Month",
+          "request": {
+            "method": "GET",
+            "header": [{ "key": "Authorization", "value": "Bearer {{token}}" }],
+            "url": { "raw": "{{baseUrl}}/api/budgets" }
+          }
+        },
+        {
+          "name": "Configure Budget",
+          "request": {
+            "method": "POST",
+            "header": [
+              { "key": "Content-Type", "value": "application/json" },
+              { "key": "Authorization", "value": "Bearer {{token}}" }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"category_id\": 1,\n  \"month\": \"2026-10\",\n  \"amount\": 6500.00,\n  \"alert_threshold\": 80\n}"
+            },
+            "url": { "raw": "{{baseUrl}}/api/budgets" }
+          }
+        }
+      ]
+    },
+    {
+      "name": "5. Recurring Payments",
+      "item": [
+        {
+          "name": "Get Recurring Bills",
+          "request": {
+            "method": "GET",
+            "header": [{ "key": "Authorization", "value": "Bearer {{token}}" }],
+            "url": { "raw": "{{baseUrl}}/api/recurring" }
+          }
+        },
+        {
+          "name": "Add Recurring Payment",
+          "request": {
+            "method": "POST",
+            "header": [
+              { "key": "Content-Type", "value": "application/json" },
+              { "key": "Authorization", "value": "Bearer {{token}}" }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"title\": \"WiFi Internet Fiber\",\n  \"category_id\": 4,\n  \"amount\": 1099.00,\n  \"frequency\": \"monthly\",\n  \"billing_day\": 2,\n  \"next_due_date\": \"2026-11-02\",\n  \"payment_method\": \"Mobile Banking\"\n}"
+            },
+            "url": { "raw": "{{baseUrl}}/api/recurring" }
+          }
+        }
+      ]
+    },
+    {
+      "name": "6. Spending Analytics",
+      "item": [
+        {
+          "name": "Get Analytics Data for Chart.js",
+          "request": {
+            "method": "GET",
+            "header": [{ "key": "Authorization", "value": "Bearer {{token}}" }],
+            "url": { "raw": "{{baseUrl}}/api/analytics/data?month=2026-10" }
+          }
+        }
+      ]
+    },
+    {
+      "name": "7. End-of-Month Reports",
+      "item": [
+        {
+          "name": "Get All Reports",
+          "request": {
+            "method": "GET",
+            "header": [{ "key": "Authorization", "value": "Bearer {{token}}" }],
+            "url": { "raw": "{{baseUrl}}/api/reports" }
+          }
+        },
+        {
+          "name": "Generate Monthly Report On-Demand",
+          "request": {
+            "method": "POST",
+            "header": [
+              { "key": "Content-Type", "value": "application/json" },
+              { "key": "Authorization", "value": "Bearer {{token}}" }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"month\": \"2026-10\"\n}"
+            },
+            "url": { "raw": "{{baseUrl}}/api/reports/generate" }
+          }
+        }
+      ]
+    },
+    {
+      "name": "8. Personalized Suggestions",
+      "item": [
+        {
+          "name": "Get Next-Month Suggestions",
+          "request": {
+            "method": "GET",
+            "header": [{ "key": "Authorization", "value": "Bearer {{token}}" }],
+            "url": { "raw": "{{baseUrl}}/api/suggestions" }
+          }
+        },
+        {
+          "name": "Refresh Suggestions",
+          "request": {
+            "method": "POST",
+            "header": [
+              { "key": "Content-Type", "value": "application/json" },
+              { "key": "Authorization", "value": "Bearer {{token}}" }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"month\": \"2026-10\"\n}"
+            },
+            "url": { "raw": "{{baseUrl}}/api/suggestions/refresh" }
+          }
+        }
+      ]
+    },
+    {
+      "name": "9. Real-Time Notifications",
+      "item": [
+        {
+          "name": "Get Notifications",
+          "request": {
+            "method": "GET",
+            "header": [{ "key": "Authorization", "value": "Bearer {{token}}" }],
+            "url": { "raw": "{{baseUrl}}/api/notifications" }
+          }
+        },
+        {
+          "name": "Mark All as Read",
+          "request": {
+            "method": "POST",
+            "header": [{ "key": "Authorization", "value": "Bearer {{token}}" }],
+            "url": { "raw": "{{baseUrl}}/api/notifications/mark-all-read" }
+          }
+        }
+      ]
+    }
+  ]
+}
