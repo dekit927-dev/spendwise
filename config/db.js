@@ -80,8 +80,8 @@ if (DB_TYPE === 'mysql') {
     if (dbUrl) {
       try {
         const u = new URL(dbUrl);
-        let database = u.pathname.replace(/^\//, '');
-        if (!database) database = isNeon ? 'neondb' : 'spendwise_db';
+        let database = u.pathname.replace(/^\//, '').split('?')[0].split('&')[0];
+        if (!database || (isNeon && database === 'spendwise_db')) database = 'neondb';
         return {
           host: u.hostname,
           port: parseInt(u.port || '5432', 10),
@@ -94,7 +94,7 @@ if (DB_TYPE === 'mysql') {
           max: 20
         };
       } catch (err) {
-        const cleanUrl = dbUrl.replace(/[?&]sslmode=[^&]+/g, '');
+        const cleanUrl = dbUrl.split('?')[0];
         return {
           connectionString: cleanUrl,
           ssl: sslConfig,

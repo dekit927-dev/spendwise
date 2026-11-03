@@ -92,12 +92,27 @@ async function initDb() {
     let targetClient;
     let targetName = 'database';
     if (dbUrl) {
-      const cleanUrl = dbUrl.replace(/[?&]sslmode=[^&]+/g, '');
-      targetClient = new Client({
-        connectionString: cleanUrl,
-        ssl: sslConfig
-      });
-      targetName = 'Cloud PostgreSQL';
+      try {
+        const u = new URL(dbUrl);
+        let database = u.pathname.replace(/^\//, '').split('?')[0].split('&')[0];
+        if (!database || (isNeon && database === 'spendwise_db')) database = 'neondb';
+        targetClient = new Client({
+          host: u.hostname,
+          port: parseInt(u.port || '5432', 10),
+          database: database,
+          user: decodeURIComponent(u.username || 'postgres'),
+          password: decodeURIComponent(u.password || ''),
+          ssl: sslConfig
+        });
+        targetName = `Neon / Cloud PostgreSQL (${database})`;
+      } catch (err) {
+        const cleanUrl = dbUrl.split('?')[0];
+        targetClient = new Client({
+          connectionString: cleanUrl,
+          ssl: sslConfig
+        });
+        targetName = 'Cloud PostgreSQL';
+      }
     } else {
       const dbName = (isNeon && (!process.env.DB_NAME || process.env.DB_NAME === 'spendwise_db')) ? 'neondb' : (process.env.DB_NAME || 'spendwise_db');
       targetClient = new Client({

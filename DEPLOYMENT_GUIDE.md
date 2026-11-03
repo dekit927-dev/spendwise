@@ -111,3 +111,4 @@ git push -u origin main
    - **Password**: `password123`
 3. Or click **"Get Started"** to create a fresh new account.
 4. Set `APP_URL` in your Render Environment Variables to your live Render URL (e.g. `https://spendwise.onrender.com`) for sharing.
+
