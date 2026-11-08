@@ -31,6 +31,22 @@
       </div>
     <% } %>
 
+    <!-- Device Push Notification Permission Prompt -->
+    <div id="enable-push-banner" class="glass-panel" style="display: none; align-items: center; justify-content: space-between; padding: 14px 18px; margin-bottom: 20px; border: 1px solid var(--border-gold); border-radius: 14px; gap: 12px; flex-wrap: wrap;">
+      <div style="display: flex; align-items: center; gap: 12px;">
+        <div style="width: 38px; height: 38px; border-radius: 10px; background: rgba(245, 158, 11, 0.2); display: flex; align-items: center; justify-content: center; color: #F59E0B; font-size: 1.15rem;">
+          <i class="fa-solid fa-bell"></i>
+        </div>
+        <div>
+          <div style="font-weight: 700; font-size: 0.94rem; color: var(--text-main);">Enable Device Streak Alerts</div>
+          <div style="font-size: 0.82rem; color: var(--text-muted);">Receive direct alerts on this phone or desktop when 24 hours pass without logging your income or expenses.</div>
+        </div>
+      </div>
+      <button type="button" class="btn btn-primary btn-sm" onclick="window.SpendWise.requestNotificationPermission()">
+        <i class="fa-solid fa-check"></i> Turn On Alerts
+      </button>
+    </div>
+
     <!-- Notification Cards Container -->
     <div style="display: flex; flex-direction: column; gap: 12px;">
       <% if (notifications && notifications.length > 0) { %>
@@ -43,6 +59,10 @@
               iconClass = 'fa-fire streak-flame';
               iconColor = '#F59E0B';
               bgGlow = 'rgba(217, 119, 6, 0.2)';
+            } else if (n.type === 'streak_reminder') {
+              iconClass = 'fa-fire-flame-curved streak-flame';
+              iconColor = '#F59E0B';
+              bgGlow = 'rgba(245, 158, 11, 0.25)';
             } else if (n.type === 'budget_warning') {
               iconClass = 'fa-triangle-exclamation';
               iconColor = '#F59E0B';
@@ -103,6 +123,15 @@
     </div>
   </div>
 </main>
+
+<script>
+  document.addEventListener('DOMContentLoaded', () => {
+    if ('Notification' in window && Notification.permission === 'default') {
+      const banner = document.getElementById('enable-push-banner');
+      if (banner) banner.style.display = 'flex';
+    }
+  });
+</script>
 
 <%- include('partials/quick-add-modal') %>
 <%- include('partials/zero-spending-modal') %>

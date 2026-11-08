@@ -8,6 +8,7 @@ const SuggestionModel = require('../models/suggestionModel');
 const SuggestionService = require('../services/suggestionService');
 const NotificationModel = require('../models/notificationModel');
 const UserModel = require('../models/userModel');
+const StreakService = require('../services/streakService');
 
 const ViewController = {
   renderIndex(req, res) {
@@ -45,6 +46,9 @@ const ViewController = {
       const today = new Date();
       const currentMonthKey = `${today.getFullYear()}-${String(today.getMonth() + 1).padStart(2, '0')}`;
       const todayStr = today.toISOString().split('T')[0];
+
+      // 0. Proactively evaluate 24-hour streak inactivity and dispatch reminder if needed
+      await StreakService.checkAndSend24HourReminder(req.user.id);
 
       // 1. Financial stats
       const totals = await TransactionModel.getMonthlyTotals(req.user.id, currentMonthKey);

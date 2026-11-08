@@ -1,5 +1,6 @@
 const jwt = require('jsonwebtoken');
 const UserModel = require('../models/userModel');
+const StreakService = require('../services/streakService');
 
 const JWT_SECRET = process.env.JWT_SECRET || 'spendwise_jwt_super_token_signature_key_2026';
 
@@ -25,6 +26,8 @@ const AuthMiddleware = {
         if (user) {
           req.user = user;
           res.locals.currentUser = user;
+          // Non-blocking 24-hour streak inactivity evaluation
+          StreakService.checkAndSend24HourReminder(user.id).catch(() => {});
           return next();
         }
       }
@@ -39,6 +42,8 @@ const AuthMiddleware = {
             if (req.session) {
               req.session.userId = user.id;
             }
+            // Non-blocking 24-hour streak inactivity evaluation
+            StreakService.checkAndSend24HourReminder(user.id).catch(() => {});
             return next();
           }
         } catch (jwtErr) {

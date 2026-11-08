@@ -1,6 +1,6 @@
 const cron = require('node-cron');
 const { db } = require('../config/db');
-const StreakModel = require('../models/streakModel');
+const StreakService = require('./streakService');
 const RecurringModel = require('../models/recurringModel');
 const NotificationService = require('./notificationService');
 const ReportService = require('./reportService');
@@ -9,32 +9,27 @@ const CronService = {
   initScheduledJobs() {
     console.log('[SpendWise] Initializing Node-Cron background schedules...');
 
-    // 1. Daily Evening Streak Reminder (Runs daily at 20:00 / 8:00 PM)
+    // 1. Regular 24-Hour Streak & Income/Expense Reminder (Runs every 30 minutes while active)
+    cron.schedule('*/30 * * * *', async () => {
+      console.log('[Cron] Checking 24-hour streak and income/expense reminders for all users...');
+      try {
+        await StreakService.checkAllUsersFor24HourReminders();
+      } catch (err) {
+        console.error('[Cron] Error in 24-hour streak cron:', err.message);
+      }
+    });
+
+    // 2. Daily Evening Streak Check (Runs daily at 20:00 / 8:00 PM)
     cron.schedule('0 20 * * *', async () => {
       console.log('[Cron] Running daily evening streak check...');
       try {
-        const todayStr = new Date().toISOString().split('T')[0];
-        const users = await db.any('SELECT id, name FROM users');
-
-        for (const user of users) {
-          const hasLogged = await StreakModel.hasLoggedToday(user.id, todayStr);
-          if (!hasLogged) {
-            const streak = await StreakModel.getStreak(user.id);
-            await NotificationService.sendNotification({
-              userId: user.id,
-              type: 'streak_reminder',
-              title: '🔥 Keep Your Streak Alive!',
-              message: `You haven't logged your spending today. Don't break your ${streak.current_streak}-day streak! Record your expenses or confirm a Nu. 0 spending day.`,
-              link: '/transactions'
-            });
-          }
-        }
+        await StreakService.checkAllUsersFor24HourReminders();
       } catch (err) {
         console.error('[Cron] Error in daily streak cron:', err.message);
       }
     });
 
-    // 2. Daily Morning Recurring Bill Reminder (Runs daily at 08:00 AM)
+    // 3. Daily Morning Recurring Bill Reminder (Runs daily at 08:00 AM)
     cron.schedule('0 8 * * *', async () => {
       console.log('[Cron] Running daily recurring bill checks...');
       try {
@@ -54,7 +49,7 @@ const CronService = {
       }
     });
 
-    // 3. Monthly Report Auto-Generation (Runs at 00:05 AM on the 1st of every month)
+    // 4. Monthly Report Auto-Generation (Runs at 00:05 AM on the 1st of every month)
     cron.schedule('5 0 1 * *', async () => {
       console.log('[Cron] Running monthly report generation for all active users...');
       try {
@@ -71,27 +66,23 @@ const CronService = {
       }
     });
 
-    console.log('[SpendWise] All cron jobs registered successfully (Daily Streaks @ 20:00, Recurring Bills @ 08:00, Monthly Reports @ 1st 00:05).');
+    // 5. Initial check on server startup / container wake-up (after 5 seconds)
+    setTimeout(async () => {
+      try {
+        console.log('[SpendWise] Running initial 24-hour streak & income/expense reminder check on startup...');
+        await StreakService.checkAllUsersFor24HourReminders();
+      } catch (err) {
+        console.error('[SpendWise] Error in startup streak check:', err.message);
+      }
+    }, 5000);
+
+    console.log('[SpendWise] All cron jobs registered successfully (Every 30m 24h reminders, Daily Streaks @ 20:00, Recurring Bills @ 08:00, Monthly Reports @ 1st 00:05).');
   },
 
   // Helper to trigger manually for demo/testing
   async triggerAllChecksNow() {
     console.log('[Cron] Manually triggering system checks...');
-    const todayStr = new Date().toISOString().split('T')[0];
-    const users = await db.any('SELECT id FROM users');
-    for (const u of users) {
-      const hasLogged = await StreakModel.hasLoggedToday(u.id, todayStr);
-      if (!hasLogged) {
-        const streak = await StreakModel.getStreak(u.id);
-        await NotificationService.sendNotification({
-          userId: u.id,
-          type: 'streak_reminder',
-          title: '🔥 Daily Tracking Reminder',
-          message: `Keep your momentum! Record your daily spending or confirm a Nu. 0 spending day to extend your ${streak.current_streak}-day flame.`,
-          link: '/transactions'
-        });
-      }
-    }
+    await StreakService.checkAllUsersFor24HourReminders();
   }
 };
 

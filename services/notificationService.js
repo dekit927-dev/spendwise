@@ -33,6 +33,17 @@ const NotificationService = {
     }
   },
 
+  async sendUnreadCountUpdate(userId) {
+    if (ioInstance) {
+      try {
+        const unreadCount = await NotificationModel.getUnreadCount(userId);
+        ioInstance.to(`user_${userId}`).emit('unread_count_update', { unreadCount });
+      } catch (err) {
+        console.error('[NotificationService] Error updating unread count:', err.message);
+      }
+    }
+  },
+
   emitMilestoneCelebration(userId, { milestoneDays, badgeName, badgeIcon, message }) {
     if (ioInstance) {
       ioInstance.to(`user_${userId}`).emit('milestone_celebration', {

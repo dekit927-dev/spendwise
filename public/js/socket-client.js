@@ -17,6 +17,19 @@
       window.SpendWise.showToast(data.title, data.message, data.type);
     }
 
+    // Trigger native browser desktop/mobile push notification if granted
+    if ('Notification' in window && Notification.permission === 'granted') {
+      try {
+        new Notification(data.title, {
+          body: data.message,
+          icon: '/images/logo.png',
+          badge: '/images/logo.png'
+        });
+      } catch (err) {
+        console.warn('[SpendWise Notification API] Desktop notification error:', err);
+      }
+    }
+
     // Increment header badge count
     const badge = document.getElementById('notif-badge-count');
     if (badge) {

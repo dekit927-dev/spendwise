@@ -12,7 +12,7 @@ window.SpendWise = {
     toast.className = 'toast';
 
     let iconClass = 'fa-circle-info text-blue-400';
-    if (type === 'streak_milestone' || type === 'zero_spending') iconClass = 'fa-fire flame-icon';
+    if (type === 'streak_milestone' || type === 'zero_spending' || type === 'streak_reminder') iconClass = 'fa-fire flame-icon';
     else if (type === 'budget_warning' || type === 'unusual_expense') iconClass = 'fa-triangle-exclamation text-yellow-400';
     else if (type === 'monthly_report') iconClass = 'fa-chart-pie text-emerald-400';
 
@@ -276,6 +276,22 @@ window.SpendWise = {
     });
 
     belowFold.forEach(el => observer.observe(el));
+  },
+
+  requestNotificationPermission() {
+    if (!('Notification' in window)) {
+      alert('Desktop/device notifications are not supported in this browser.');
+      return;
+    }
+    Notification.requestPermission().then((perm) => {
+      if (perm === 'granted') {
+        const banner = document.getElementById('enable-push-banner');
+        if (banner) banner.remove();
+        if (window.SpendWise && window.SpendWise.showToast) {
+          window.SpendWise.showToast('🔔 Streak Alerts Enabled!', 'You will receive device alerts when 24 hours elapse without logging income or expenses.', 'info');
+        }
+      }
+    });
   }
 };
 
