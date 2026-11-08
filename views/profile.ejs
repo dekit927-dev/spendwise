@@ -3,12 +3,17 @@
 
 <main class="main-content">
   <div class="container" style="max-width: 840px;">
-    <div style="margin-bottom: 26px;">
-      <span class="badge badge-gold" style="margin-bottom: 6px;">
-        <i class="fa-solid fa-user-gear"></i> PERSONAL PREFERENCES
-      </span>
-      <h1 style="font-size: 2.2rem; margin-bottom: 4px; color: var(--gold-pale);">Profile & Account Settings</h1>
-      <p style="color: var(--text-muted); font-size: 0.94rem;">Manage your personal profile, notification preferences, and theme palette.</p>
+    <div style="display: flex; align-items: center; justify-content: space-between; flex-wrap: wrap; gap: 16px; margin-bottom: 26px;">
+      <div>
+        <span class="badge badge-gold" style="margin-bottom: 6px;">
+          <i class="fa-solid fa-user-gear"></i> PERSONAL PREFERENCES
+        </span>
+        <h1 style="font-size: 2.2rem; margin-bottom: 4px; color: var(--gold-pale);">Profile & Account Settings</h1>
+        <p style="color: var(--text-muted); font-size: 0.94rem;">Manage your personal profile, notification preferences, and theme palette.</p>
+      </div>
+      <a href="/auth/logout" class="btn btn-outline btn-sm" style="color: #FB7185; border-color: rgba(244, 63, 94, 0.4); gap: 6px;">
+        <i class="fa-solid fa-arrow-right-from-bracket"></i> Log Out
+      </a>
     </div>
 
     <% if (query && query.success) { %>
@@ -40,11 +45,14 @@
             </div>
             <span style="font-size: 0.88rem; color: var(--text-muted); display: block; margin: 4px 0;"><%= currentUser.email %></span>
             <span style="font-size: 0.82rem; color: var(--gold);"><i class="fa-solid fa-wallet"></i> Personal Finance</span>
-            <div style="margin-top: 10px;">
+            <div style="margin-top: 12px; display: flex; align-items: center; gap: 10px; flex-wrap: wrap;">
               <label class="btn btn-outline btn-sm" style="cursor: pointer;">
                 <i class="fa-solid fa-camera"></i> Change Avatar
                 <input type="file" name="avatar" accept="image/*" style="display: none;">
               </label>
+              <a href="/auth/logout" class="btn btn-outline btn-sm" style="color: #FB7185; border-color: rgba(244, 63, 94, 0.35); gap: 6px;">
+                <i class="fa-solid fa-arrow-right-from-bracket"></i> Log Out
+              </a>
             </div>
           </div>
         </div>
@@ -129,13 +137,31 @@
           </div>
         </div>
 
-        <div style="display: flex; justify-content: flex-end;">
+        <div style="display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 14px;">
+          <a href="/auth/logout" class="btn btn-outline" style="color: #FB7185; border-color: rgba(244, 63, 94, 0.4); gap: 8px;">
+            <i class="fa-solid fa-arrow-right-from-bracket"></i> Log Out
+          </a>
           <button type="submit" class="btn btn-primary" style="width: 100%; max-width: 320px; justify-content: center;">
             <i class="fa-solid fa-floppy-disk"></i> Save Preferences & Security
           </button>
         </div>
       </div>
     </form>
+
+    <!-- Card 4: Session & Security -->
+    <div class="glass-panel apple-reveal" style="padding: 26px 32px; border-radius: 20px; margin-top: 24px; display: flex; align-items: center; justify-content: space-between; flex-wrap: wrap; gap: 16px; border-left: 4px solid #EF4444;">
+      <div>
+        <div style="font-family: 'Outfit', sans-serif; font-weight: 700; color: var(--text-main); font-size: 1.15rem; margin-bottom: 4px;">
+          <i class="fa-solid fa-shield-halved" style="color: #EF4444; margin-right: 8px;"></i> Account Session & Security
+        </div>
+        <div style="font-size: 0.86rem; color: var(--text-muted);">
+          Safely sign out of your SpendWise session on this device.
+        </div>
+      </div>
+      <a href="/auth/logout" class="btn btn-outline" style="color: #FB7185; border-color: rgba(244, 63, 94, 0.45); gap: 8px;">
+        <i class="fa-solid fa-arrow-right-from-bracket"></i> Log Out of SpendWise
+      </a>
+    </div>
   </div>
 </main>
 
