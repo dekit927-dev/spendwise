@@ -47,8 +47,10 @@ const ViewController = {
       const currentMonthKey = `${today.getFullYear()}-${String(today.getMonth() + 1).padStart(2, '0')}`;
       const todayStr = today.toISOString().split('T')[0];
 
-      // 0. Proactively evaluate 24-hour streak inactivity and dispatch reminder if needed
+      // 0. Proactively evaluate 24-hour streak inactivity and upcoming bill reminders
       await StreakService.checkAndSend24HourReminder(req.user.id);
+      const CronService = require('../services/cronService');
+      await CronService.checkUpcomingBillsForUser(req.user.id, 3);
 
       // 1. Financial stats
       const totals = await TransactionModel.getMonthlyTotals(req.user.id, currentMonthKey);
